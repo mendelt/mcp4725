@@ -1,0 +1,8 @@
+[package]
+name = "mcp4725"
+version = "0.1.0"
+authors = ["Mendelt Siebenga <msiebenga@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+embedded-hal = "0.2"
