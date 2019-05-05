@@ -6,3 +6,13 @@ edition = "2018"
 
 [dependencies]
 embedded-hal = "0.2"
+nb = "0.1"
+
+[dev-dependencies]
+cortex-m-rt = "0.6.7"
+cortex-m-semihosting = "0.3.2"
+panic-semihosting = "0.5.1"
+
+[dev-dependencies.stm32f1xx-hal]
+version = "0.3.0"
+features = ["rt", "stm32f103"]
