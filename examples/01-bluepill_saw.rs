@@ -7,7 +7,6 @@ use cortex_m_rt::entry;
 use stm32f1xx_hal::prelude::*;
 use stm32f1xx_hal::pac;
 use stm32f1xx_hal::i2c::{Mode, BlockingI2c};
-use embedded_hal::blocking::i2c::Write;
 
 #[entry]
 fn main() -> ! {
@@ -22,8 +21,8 @@ fn main() -> ! {
     let mut afio = dp.AFIO.constrain(&mut rcc.apb2);
 
     // Configure the pins for I2C1
-    let mut scl = gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh);
-    let mut sda = gpiob.pb9.into_alternate_open_drain(&mut gpiob.crh);
+    let scl = gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh);
+    let sda = gpiob.pb9.into_alternate_open_drain(&mut gpiob.crh);
 
     // Configure I2C
 
