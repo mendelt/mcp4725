@@ -1,8 +1,15 @@
 [package]
 name = "mcp4725"
 version = "0.1.0"
-authors = ["Mendelt Siebenga <msiebenga@gmail.com>"]
 edition = "2018"
+
+authors = ["Mendelt Siebenga <msiebenga@gmail.com>"]
+license = "MIT/Apache-2.0"
+description = "Microchip MCP4725 DAC Driver for Rust Embedded HAL"
+repository = "https://github.com/mendelt/mcp4725"
+categories = ["no-std", "embedded"]
+keywords = ["dac", "i2c"]
+readme = "README.md"
 
 [dependencies]
 embedded-hal = "0.2"
@@ -16,3 +23,4 @@ panic-semihosting = "0.5.1"
 [dev-dependencies.stm32f1xx-hal]
 version = "0.3.0"
 features = ["rt", "stm32f103"]
+
