@@ -2,14 +2,14 @@
 #![no_std]
 
 use cortex_m_rt::entry;
-use stm32f1xx_hal::prelude::*;
-use stm32f1xx_hal::pac;
-use stm32f1xx_hal::i2c::{Mode, BlockingI2c};
 use stm32f1xx_hal::delay::Delay;
+use stm32f1xx_hal::i2c::{BlockingI2c, Mode};
+use stm32f1xx_hal::pac;
+use stm32f1xx_hal::prelude::*;
 
+use mcp4725::*;
 #[allow(unused_imports)]
 use panic_semihosting;
-use mcp4725::*;
 
 #[entry]
 fn main() -> ! {
@@ -35,10 +35,13 @@ fn main() -> ! {
         dp.I2C1,
         (scl, sda),
         &mut afio.mapr,
-        Mode::Standard{frequency: 10000},
+        Mode::Standard { frequency: 10000 },
         clocks,
         &mut rcc.apb1,
-        1000,10,1000,1000,
+        1000,
+        10,
+        1000,
+        1000,
     );
 
     let mut dac = MCP4725::create(i2c);
