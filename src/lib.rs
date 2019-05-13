@@ -55,6 +55,11 @@ where
     pub fn send(&mut self, command: &Command) {
         self.i2c.write(command.address_byte, &command.data_bytes());
     }
+
+    /// Send a fast command
+    pub fn send_fast(&mut self, command: &FastCommand) {
+        self.i2c.write(command.address, &[command.databyte1, command.databyte2]);
+    }
 }
 
 const DEVICE_ID: u8 = 0b1100;
@@ -97,7 +102,7 @@ impl Default for Command {
 impl Command {
     /// Format data bytes to send to the DAC. At the moment only sending one sample at a time is
     /// supported.
-    pub fn data_bytes(&self) -> [u8; 3] {
+    pub fn bytes(&self) -> [u8; 3] {
         [self.command_byte, self.data_byte_0, self.data_byte_1]
     }
 
@@ -128,6 +133,54 @@ impl Command {
     }
 }
 
+pub struct FastCommand {
+    address: u8,
+    databyte1: u8,
+    databyte2: u8,
+
+    powermode: u8,
+}
+
+impl Default for FastCommand {
+    fn default() -> Self {
+        FastCommand {
+            address: DEVICE_ID << 3,
+            powermode: 0,
+            databyte1: 0,
+            databyte2: 0,
+        }
+    }
+}
+
+impl FastCommand {
+    pub fn address_byte(&self) -> u8 {
+        self.address
+    }
+
+    pub fn bytes(&self) -> [u8; 2] {
+        [self.databyte1, self.databyte2]
+    }
+
+    pub fn set_address(mut self, address: u8) -> Self {
+        self.address = (DEVICE_ID << 3) + (address & 0b00000111);
+        self
+    }
+
+    pub fn set_data(mut self, data: u16) -> Self {
+        self.databyte1 = ((data >> 8) as u8) | self.powermode;
+        self.databyte2 = data as u8;
+
+        self
+    }
+
+    pub fn set_power_mode(mut self, mode: PowerMode) -> Self {
+        self.powermode = (mode as u8) << 5;
+        self.databyte1 &= (0x0f | self.powermode);
+
+        self
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -150,13 +203,15 @@ mod tests {
     fn should_encode_data_into_data_bytes() {
         let cmd = Command::default().data(0x0fff);
 
-        assert_eq!(cmd.data_bytes(), [0b01000000, 0b11111111, 0b11110000])
+        assert_eq!(cmd.bytes(), [0b01000000, 0b11111111, 0b11110000])
     }
 
     #[test]
     fn should_encode_command_into_data_bytes() {
         let cmd = Command::default().command_type(CommandType::WriteDacAndEEPROM);
 
-        assert_eq!(cmd.data_bytes(), [0b01100000, 0, 0])
+        assert_eq!(cmd.bytes(), [0b01100000, 0, 0])
     }
+
+    //TODO Test FastCommand
 }
