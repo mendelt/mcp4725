@@ -20,7 +20,6 @@
 
 #![no_std]
 
-//use nb::Result;
 use core::cmp;
 use embedded_hal::blocking::i2c::Write;
 
@@ -48,6 +47,16 @@ where
 
 const DEVICE_ID: u8 = 0b1100;
 
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[repr(u8)]
+pub enum PowerMode {
+    Normal = 0b00,
+    Resistor1kOhm = 0b01,
+    Resistor100kOhm = 0b10,
+    Resistor500kOhm = 0b11,
+}
+
+#[derive(Debug, Eq, PartialEq)]
 pub struct Command {
     address: u8,
     write_eeprom: bool,
@@ -58,21 +67,12 @@ pub struct Command {
 impl Default for Command {
     fn default() -> Self {
         Self {
-            address: 0,
+            address: DEVICE_ID << 3,
             write_eeprom: false,
             power_mode: PowerMode::Normal,
             data: 0,
         }
     }
-}
-
-#[derive(Copy, Clone)]
-#[repr(u8)]
-pub enum PowerMode {
-    Normal = 0b00,
-    Resistor1kOhm = 0b01,
-    Resistor100kOhm = 0b10,
-    Resistor500kOhm = 0b11,
 }
 
 impl Command {
