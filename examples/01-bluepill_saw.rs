@@ -1,8 +1,9 @@
+//! MPC4725 for the stm32f103. It uses the I2C 1 interface on pins pb8 and pb9 to control the DAC
+
 #![no_main]
 #![no_std]
 
 use cortex_m_rt::entry;
-use stm32f1xx_hal::delay::Delay;
 use stm32f1xx_hal::i2c::{BlockingI2c, Mode};
 use stm32f1xx_hal::pac;
 use stm32f1xx_hal::prelude::*;
@@ -27,15 +28,12 @@ fn main() -> ! {
     let scl = gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh);
     let sda = gpiob.pb9.into_alternate_open_drain(&mut gpiob.crh);
 
-    // let mut delay = Delay::new(cp.SYST, clocks);
-
     // Configure I2C
-
-    let mut i2c = BlockingI2c::i2c1(
+    let i2c = BlockingI2c::i2c1(
         dp.I2C1,
         (scl, sda),
         &mut afio.mapr,
-        Mode::Standard { frequency: 10000 },
+        Mode::Standard { frequency: 100000 },
         clocks,
         &mut rcc.apb1,
         1000,
@@ -44,12 +42,14 @@ fn main() -> ! {
         1000,
     );
 
+    // Configure the MCP4725 DAC
     let mut dac = MCP4725::create(i2c);
-    let mut dac_cmd = Command::default();
 
-    dac_cmd = dac_cmd.address(0b00000010);
+    // Create the dac command and set it to the right address
+    let mut dac_cmd = Command::default().address(0b010);
+
+    // Slowly increase the output of the DAC to it's maximum value, then start over
     let mut value: u16 = 0;
-
     loop {
         dac_cmd = dac_cmd.data(value);
         dac.send(&dac_cmd);
