@@ -1,3 +1,23 @@
+//! MCP4725 I2C DAC Driver
+//!
+//! The driver can be initialized by calling create and passing it an I2C interface.
+//! ```rust
+//! let mut dac = MCP4725::create(i2c);
+//! ```
+//!
+//! A command can then be created and initialized with the device address and some data, and sent
+//! the DAC.
+//! ```rust
+//! let mut dac_cmd = Command::default().address(0b111).data(14);
+//! dac.send(dac_cmd);
+//! ```
+//!
+//! New data can be sent using the existing command by just changing the data and re-sending.
+//! ```rust
+//! dac_cmd = dac_cmd.data(348);
+//! dac.send(dac_cmd);
+//! ```
+
 #![no_std]
 
 //use nb::Result;
@@ -19,6 +39,7 @@ where
         MCP4725 { i2c }
     }
 
+    /// Send a command to the MCP4725
     pub fn send(&mut self, command: &Command) {
         self.i2c
             .write(command.address_byte(), &command.data_bytes());
@@ -80,7 +101,7 @@ impl Command {
         self
     }
 
-    /// Set the 3 bit address to use with this command
+    /// Set the 3 bit address
     pub fn address(mut self, address: u8) -> Self {
         self.address = (DEVICE_ID << 3) + (address & 0b00000111);
         self
