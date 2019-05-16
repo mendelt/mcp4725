@@ -40,8 +40,7 @@ where
 
     /// Send a command to the MCP4725
     pub fn send(&mut self, command: &Command) {
-        self.i2c
-            .write(command.address_byte, &command.data_bytes());
+        self.i2c.write(command.address_byte, &command.data_bytes());
     }
 }
 
@@ -76,7 +75,6 @@ impl Default for Command {
 }
 
 impl Command {
-
     /// Format data bytes to send to the DAC. At the moment only sending one sample at a time is
     /// supported.
     pub fn data_bytes(&self) -> [u8; 3] {
@@ -86,7 +84,7 @@ impl Command {
             } else {
                 0x20
             } + (self.power_mode as u8)
-                << 1,  // TODO Should have extra parentheses, check on the scope
+                << 1, // TODO Should have extra parentheses, check on the scope
             (self.data >> 4) as u8,
             (self.data & 0x000f << 4) as u8,
         ]
@@ -139,13 +137,13 @@ mod tests {
     fn should_encode_data_into_data_bytes() {
         let cmd = Command::default().data(0x0fff);
 
-        assert_eq!(cmd.data_bytes(), [0b01000000, 0b11111111, 0b11110000])  // TODO: check this on the scope
+        assert_eq!(cmd.data_bytes(), [0b01000000, 0b11111111, 0b11110000]) // TODO: check this on the scope
     }
 
     #[test]
     fn should_encode_command_into_data_bytes() {
         let cmd = Command::default().write_eeprom(true);
 
-        assert_eq!(cmd.data_bytes(), [0b11000000, 0, 0])  // TODO: check this on the scope
+        assert_eq!(cmd.data_bytes(), [0b11000000, 0, 0]) // TODO: check this on the scope
     }
 }
