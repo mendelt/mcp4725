@@ -1,19 +1,19 @@
 //! MCP4725 I2C DAC Driver
 //!
 //! The driver can be initialized by calling create and passing it an I2C interface.
-//! ```rust
+//! ```rust, ignore
 //! let mut dac = MCP4725::create(i2c);
 //! ```
 //!
 //! A command can then be created and initialized with the device address and some data, and sent
 //! the DAC.
-//! ```rust
+//! ```rust, ignore
 //! let mut dac_cmd = Command::default().address(0b111).data(14);
 //! dac.send(dac_cmd);
 //! ```
 //!
 //! New data can be sent using the existing command by just changing the data and re-sending.
-//! ```rust
+//! ```rust, ignore
 //! dac_cmd = dac_cmd.data(348);
 //! dac.send(dac_cmd);
 //! ```
@@ -41,7 +41,7 @@ where
     /// Send a command to the MCP4725
     pub fn send(&mut self, command: &Command) {
         self.i2c
-            .write(command.address_byte(), &command.data_bytes());
+            .write(command.address_byte, &command.data_bytes());
     }
 }
 
@@ -58,7 +58,7 @@ pub enum PowerMode {
 
 #[derive(Debug, Eq, PartialEq)]
 pub struct Command {
-    address: u8,
+    address_byte: u8,
     write_eeprom: bool,
     power_mode: PowerMode,
     data: u16,
@@ -67,7 +67,7 @@ pub struct Command {
 impl Default for Command {
     fn default() -> Self {
         Self {
-            address: DEVICE_ID << 3,
+            address_byte: DEVICE_ID << 3,
             write_eeprom: false,
             power_mode: PowerMode::Normal,
             data: 0,
@@ -76,9 +76,6 @@ impl Default for Command {
 }
 
 impl Command {
-    pub fn address_byte(&self) -> u8 {
-        self.address
-    }
 
     /// Format data bytes to send to the DAC. At the moment only sending one sample at a time is
     /// supported.
@@ -103,7 +100,7 @@ impl Command {
 
     /// Set the 3 bit address
     pub fn address(mut self, address: u8) -> Self {
-        self.address = (DEVICE_ID << 3) + (address & 0b00000111);
+        self.address_byte = (DEVICE_ID << 3) + (address & 0b00000111);
         self
     }
 
@@ -117,5 +114,24 @@ impl Command {
     pub fn power_mode(mut self, mode: PowerMode) -> Self {
         self.power_mode = mode;
         self
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn should_encode_address_with_device_id() {
+        let cmd = Command::default().address(0b111);
+
+        assert_eq!(cmd.address_byte, 0b01100111);
+    }
+
+    #[test]
+    fn should_ignore_adresses_with_more_than_3_bits() {
+        let cmd = Command::default().address(0b11111000);
+
+        assert_eq!(cmd.address_byte, 0b01100000);
     }
 }
