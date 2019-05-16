@@ -86,7 +86,7 @@ impl Command {
             } else {
                 0x20
             } + (self.power_mode as u8)
-                << 1,
+                << 1,  // TODO Should have extra parentheses, check on the scope
             (self.data >> 4) as u8,
             (self.data & 0x000f << 4) as u8,
         ]
@@ -130,8 +130,22 @@ mod tests {
 
     #[test]
     fn should_ignore_adresses_with_more_than_3_bits() {
-        let cmd = Command::default().address(0b11111000);
+        let cmd = Command::default().address(0b11111010);
 
-        assert_eq!(cmd.address_byte, 0b01100000);
+        assert_eq!(cmd.address_byte, 0b01100010);
+    }
+
+    #[test]
+    fn should_encode_data_into_data_bytes() {
+        let cmd = Command::default().data(0x0fff);
+
+        assert_eq!(cmd.data_bytes(), [0b01000000, 0b11111111, 0b11110000])  // TODO: check this on the scope
+    }
+
+    #[test]
+    fn should_encode_command_into_data_bytes() {
+        let cmd = Command::default().write_eeprom(true);
+
+        assert_eq!(cmd.data_bytes(), [0b11000000, 0, 0])  // TODO: check this on the scope
     }
 }
