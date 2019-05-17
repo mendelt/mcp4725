@@ -1,9 +1,30 @@
-# Microchip MCP4725 DAC Driver for Rust Embedded HAL
+# mcp4725 &emsp; [![Build Status](https://travis-ci.org/mendelt/mcp4725.svg?branch=master)](https://travis-ci.org/mendelt/mcp4725)
 
-This is a driver crate for embedded Rust. It's built on top of the Rust [embedded HAL](https://github.com/rust-embedded/embedded-hal)
-It supports constructing and sending commands to a MCP4725 DAC over I2C.
+*Microchip MCP4725 DAC Driver for Rust Embedded HAL*
+This is a driver crate for embedded Rust. It's built on top of the Rust
+[embedded HAL](https://github.com/rust-embedded/embedded-hal)
+It supports sending commands to a MCP4725 DAC over I2C.
+To get started you can look at a short
+[example](https://github.com/mendelt/bluepill-examples/blob/master/examples/01-bluepill_saw.rs)
+on how to use this driver on an inexpensive blue pill STM32F103 board.
 
-To get started you can look at a short [example](https://github.com/mendelt/mcp4725/blob/master/examples/01-bluepill_saw.rs) on how to use this driver on an inexpensive blue pill STM32F103 board.
+The driver can be initialized by calling create and passing it an I2C interface.
+```rust, ignore
+let mut dac = MCP4725::create(i2c);
+```rust
+
+A command can then be created and initialized with the device address and some data, and sent
+the DAC.
+```rust, ignore
+let mut dac_cmd = Command::default().address(0b111).data(14);
+dac.send(dac_cmd);
+```
+
+New data can be sent using the existing command by just changing the data and re-sending.
+```rust, ignore
+dac_cmd = dac_cmd.data(348);
+dac.send(dac_cmd);
+```rust
 
 ## More information
 - [MCP4725 datasheet](http://ww1.microchip.com/downloads/en/DeviceDoc/22039d.pdf)
@@ -11,6 +32,8 @@ To get started you can look at a short [example](https://github.com/mendelt/mcp4
 - [Github repository](https://github.com/mendelt/mcp4725)
 - [Crates.io](https://crates.io/crates/mcp4725)
 
+
+*version: 0.1.0*
 ## License
 
 Licensed under either of
