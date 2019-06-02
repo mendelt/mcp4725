@@ -61,28 +61,35 @@ const DEVICE_ID: u8 = 0b1100;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 #[repr(u8)]
+pub enum CommandType {
+    WriteDac = 0x40,
+    WriteDacAndEEPROM = 0x60,
+}
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[repr(u8)]
 pub enum PowerMode {
     Normal = 0b00,
-    Resistor1kOhm = 0b01,
-    Resistor100kOhm = 0b10,
-    Resistor500kOhm = 0b11,
+    Resistor1kOhm = 0b010,
+    Resistor100kOhm = 0b100,
+    Resistor500kOhm = 0b110,
 }
 
 #[derive(Debug, Eq, PartialEq)]
 pub struct Command {
     address_byte: u8,
-    write_eeprom: bool,
-    power_mode: PowerMode,
-    data: u16,
+    command_byte: u8,
+    data_byte_0: u8,
+    data_byte_1: u8,
 }
 
 impl Default for Command {
     fn default() -> Self {
         Self {
             address_byte: DEVICE_ID << 3,
-            write_eeprom: false,
-            power_mode: PowerMode::Normal,
-            data: 0,
+            command_byte: CommandType::WriteDac as u8,
+            data_byte_0: 0,
+            data_byte_1: 0,
         }
     }
 }
@@ -91,20 +98,14 @@ impl Command {
     /// Format data bytes to send to the DAC. At the moment only sending one sample at a time is
     /// supported.
     pub fn data_bytes(&self) -> [u8; 3] {
-        [
-            if self.write_eeprom == true {
-                0x50 // 0x60
-            } else {
-                0x40 // 0x20
-            } + ((self.power_mode as u8) << 1),
-            (self.data >> 4) as u8,
-            (self.data & 0x000f << 4) as u8,
-        ]
+        [self.command_byte, self.data_byte_0, self.data_byte_1]
     }
 
     /// Set the data to send with this command. This data will be truncated to a 12 bit int
     pub fn data(mut self, data: u16) -> Self {
-        self.data = cmp::min(data, 0x0fff);
+        self.data_byte_0 = (data >> 4) as u8;
+        self.data_byte_1 = (data & 0x000f << 4) as u8;
+
         self
     }
 
@@ -115,14 +116,14 @@ impl Command {
     }
 
     /// Write the supplied values to the EEPROM as well as to the DAC
-    pub fn write_eeprom(mut self, write: bool) -> Self {
-        self.write_eeprom = write;
+    pub fn command_type(mut self, command: CommandType) -> Self {
+        self.command_byte = (self.command_byte & 0b00011111) | command as u8;
         self
     }
 
     /// Set the power mode
     pub fn power_mode(mut self, mode: PowerMode) -> Self {
-        self.power_mode = mode;
+        self.command_byte = (self.command_byte & 0b11111000) | mode as u8;
         self
     }
 }
@@ -149,13 +150,13 @@ mod tests {
     fn should_encode_data_into_data_bytes() {
         let cmd = Command::default().data(0x0fff);
 
-        assert_eq!(cmd.data_bytes(), [0b01000000, 0b11111111, 0b11110000]) // TODO: check this on the scope
+        assert_eq!(cmd.data_bytes(), [0b01000000, 0b11111111, 0b11110000])
     }
 
     #[test]
     fn should_encode_command_into_data_bytes() {
-        let cmd = Command::default().write_eeprom(true);
+        let cmd = Command::default().command_type(CommandType::WriteDacAndEEPROM);
 
-        assert_eq!(cmd.data_bytes(), [0b11000000, 0, 0]) // TODO: check this on the scope
+        assert_eq!(cmd.data_bytes(), [0b01100000, 0, 0])
     }
 }
