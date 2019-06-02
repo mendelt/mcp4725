@@ -93,11 +93,10 @@ impl Command {
     pub fn data_bytes(&self) -> [u8; 3] {
         [
             if self.write_eeprom == true {
-                0x60
+                0x50 // 0x60
             } else {
-                0x20
-            } + (self.power_mode as u8)
-                << 1, // TODO Should have extra parentheses, check on the scope
+                0x40 // 0x20
+            } + ((self.power_mode as u8) << 1),
             (self.data >> 4) as u8,
             (self.data & 0x000f << 4) as u8,
         ]
