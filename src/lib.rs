@@ -53,13 +53,12 @@ where
 
     /// Send a command to the MCP4725
     pub fn send(&mut self, command: &Command) {
-        self.i2c.write(command.address_byte, &command.data_bytes());
+        self.i2c.write(command.address_byte, &command.bytes());
     }
 
     /// Send a fast command
     pub fn send_fast(&mut self, command: &FastCommand) {
-        self.i2c
-            .write(command.address, &[command.databyte1, command.databyte2]);
+        self.i2c.write(command.address, &command.bytes());
     }
 }
 
