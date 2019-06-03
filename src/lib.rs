@@ -135,8 +135,8 @@ impl Command {
 
 pub struct FastCommand {
     address_byte: u8,
-    databyte1: u8,
-    databyte2: u8,
+    data_byte_0: u8,
+    data_byte_1: u8,
 
     powermode: u8,
 }
@@ -146,15 +146,15 @@ impl Default for FastCommand {
         FastCommand {
             address_byte: DEVICE_ID << 3,
             powermode: 0,
-            databyte1: 0,
-            databyte2: 0,
+            data_byte_0: 0,
+            data_byte_1: 0,
         }
     }
 }
 
 impl FastCommand {
     pub fn bytes(&self) -> [u8; 2] {
-        [self.databyte1, self.databyte2]
+        [self.data_byte_0, self.data_byte_1]
     }
 
     pub fn address(mut self, address: u8) -> Self {
@@ -163,15 +163,15 @@ impl FastCommand {
     }
 
     pub fn data(mut self, data: u16) -> Self {
-        self.databyte1 = ((data >> 8) as u8) | self.powermode;
-        self.databyte2 = data as u8;
+        self.data_byte_0 = ((data >> 8) as u8) | self.powermode;
+        self.data_byte_1 = data as u8;
 
         self
     }
 
     pub fn power_mode(mut self, mode: PowerMode) -> Self {
         self.powermode = (mode as u8) << 3;
-        self.databyte1 = (self.databyte1 & 0x0f) | self.powermode;
+        self.data_byte_0 = (self.data_byte_0 & 0x0f) | self.powermode;
 
         self
     }
