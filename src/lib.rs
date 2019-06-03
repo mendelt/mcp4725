@@ -178,7 +178,7 @@ impl FastCommand {
 }
 
 #[cfg(test)]
-mod tests {
+mod test_command {
     use super::*;
 
     #[test]
@@ -215,6 +215,37 @@ mod tests {
 
         assert_eq!(cmd.bytes(), [0b01100000, 0, 0])
     }
+}
 
-    //TODO Test FastCommand
+#[cfg(test)]
+mod test_fast_command {
+    use super::*;
+
+    #[test]
+    fn should_encode_address_with_device_id() {
+        let cmd = FastCommand::default().address(0b111);
+
+        assert_eq!(cmd.address_byte, 0b01100111);
+    }
+
+    #[test]
+    fn should_ignore_adresses_with_more_than_3_bits() {
+        let cmd = FastCommand::default().address(0b11111010);
+
+        assert_eq!(cmd.address_byte, 0b01100010);
+    }
+
+    #[test]
+    fn should_encode_data_into_data_bytes() {
+        let cmd = FastCommand::default().data(0x0fff);
+
+        assert_eq!(cmd.bytes(), [0b00001111, 0b11111111])
+    }
+
+    #[test]
+    fn should_encode_powermode_into_data_bytes() {
+        let cmd = FastCommand::default().power_mode(PowerMode::Resistor500kOhm);
+
+        assert_eq!(cmd.bytes(), [0b00110000, 0])
+    }
 }
