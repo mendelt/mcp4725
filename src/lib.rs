@@ -170,8 +170,8 @@ impl FastCommand {
     }
 
     pub fn power_mode(mut self, mode: PowerMode) -> Self {
-        self.powermode = (mode as u8) << 5;
-        self.databyte1 &= (0x0f | self.powermode);
+        self.powermode = (mode as u8) << 3;
+        self.databyte1 = (self.databyte1 & 0x0f) | self.powermode;
 
         self
     }
