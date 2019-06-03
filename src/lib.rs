@@ -203,6 +203,13 @@ mod tests {
     }
 
     #[test]
+    fn should_encode_power_mode_into_data_bytes() {
+        let cmd = Command::default().power_mode(PowerMode::Resistor1kOhm);
+
+        assert_eq!(cmd.bytes(), [0b01000010, 0, 0])
+    }
+
+    #[test]
     fn should_encode_command_into_data_bytes() {
         let cmd = Command::default().command_type(CommandType::WriteDacAndEEPROM);
 
