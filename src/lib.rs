@@ -58,7 +58,8 @@ where
 
     /// Send a fast command
     pub fn send_fast(&mut self, command: &FastCommand) {
-        self.i2c.write(command.address, &[command.databyte1, command.databyte2]);
+        self.i2c
+            .write(command.address, &[command.databyte1, command.databyte2]);
     }
 }
 
