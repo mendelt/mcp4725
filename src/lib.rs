@@ -58,7 +58,7 @@ where
 
     /// Send a fast command
     pub fn send_fast(&mut self, command: &FastCommand) {
-        self.i2c.write(command.address, &command.bytes());
+        self.i2c.write(command.address_byte, &command.bytes());
     }
 }
 
@@ -134,7 +134,7 @@ impl Command {
 }
 
 pub struct FastCommand {
-    address: u8,
+    address_byte: u8,
     databyte1: u8,
     databyte2: u8,
 
@@ -144,7 +144,7 @@ pub struct FastCommand {
 impl Default for FastCommand {
     fn default() -> Self {
         FastCommand {
-            address: DEVICE_ID << 3,
+            address_byte: DEVICE_ID << 3,
             powermode: 0,
             databyte1: 0,
             databyte2: 0,
@@ -153,27 +153,23 @@ impl Default for FastCommand {
 }
 
 impl FastCommand {
-    pub fn address_byte(&self) -> u8 {
-        self.address
-    }
-
     pub fn bytes(&self) -> [u8; 2] {
         [self.databyte1, self.databyte2]
     }
 
-    pub fn set_address(mut self, address: u8) -> Self {
-        self.address = (DEVICE_ID << 3) + (address & 0b00000111);
+    pub fn address(mut self, address: u8) -> Self {
+        self.address_byte = (DEVICE_ID << 3) + (address & 0b00000111);
         self
     }
 
-    pub fn set_data(mut self, data: u16) -> Self {
+    pub fn data(mut self, data: u16) -> Self {
         self.databyte1 = ((data >> 8) as u8) | self.powermode;
         self.databyte2 = data as u8;
 
         self
     }
 
-    pub fn set_power_mode(mut self, mode: PowerMode) -> Self {
+    pub fn power_mode(mut self, mode: PowerMode) -> Self {
         self.powermode = (mode as u8) << 5;
         self.databyte1 &= (0x0f | self.powermode);
 
