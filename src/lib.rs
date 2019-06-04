@@ -32,10 +32,7 @@
 //!
 
 #![no_std]
-#[warn(
-    missing_debug_implementations,
-    missing_docs,
-)]
+#[warn(missing_debug_implementations, missing_docs)]
 use embedded_hal::blocking::i2c::Write;
 
 /// MCP4725 DAC driver. Wraps an I2C port and uses it to communicate to send commands to an MCP4725
