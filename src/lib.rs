@@ -75,9 +75,9 @@ pub enum CommandType {
 #[repr(u8)]
 pub enum PowerMode {
     Normal = 0b00,
-    Resistor1kOhm = 0b010,
-    Resistor100kOhm = 0b100,
-    Resistor500kOhm = 0b110,
+    Resistor1kOhm = 0b01,
+    Resistor100kOhm = 0b10,
+    Resistor500kOhm = 0b11,
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -128,51 +128,7 @@ impl Command {
 
     /// Set the power mode
     pub fn power_mode(mut self, mode: PowerMode) -> Self {
-        self.command_byte = (self.command_byte & 0b11111000) | mode as u8;
-        self
-    }
-}
-
-pub struct FastCommand {
-    address_byte: u8,
-    data_byte_0: u8,
-    data_byte_1: u8,
-
-    powermode: u8,
-}
-
-impl Default for FastCommand {
-    fn default() -> Self {
-        FastCommand {
-            address_byte: DEVICE_ID << 3,
-            powermode: 0,
-            data_byte_0: 0,
-            data_byte_1: 0,
-        }
-    }
-}
-
-impl FastCommand {
-    pub fn bytes(&self) -> [u8; 2] {
-        [self.data_byte_0, self.data_byte_1]
-    }
-
-    pub fn address(mut self, address: u8) -> Self {
-        self.address_byte = (DEVICE_ID << 3) + (address & 0b00000111);
-        self
-    }
-
-    pub fn data(mut self, data: u16) -> Self {
-        self.data_byte_0 = ((data >> 8) as u8) | self.powermode;
-        self.data_byte_1 = data as u8;
-
-        self
-    }
-
-    pub fn power_mode(mut self, mode: PowerMode) -> Self {
-        self.powermode = (mode as u8) << 3;
-        self.data_byte_0 = (self.data_byte_0 & 0x0f) | self.powermode;
-
+        self.command_byte = (self.command_byte & 0b11111000) | ((mode as u8) << 1);
         self
     }
 }
@@ -214,6 +170,50 @@ mod test_command {
         let cmd = Command::default().command_type(CommandType::WriteDacAndEEPROM);
 
         assert_eq!(cmd.bytes(), [0b01100000, 0, 0])
+    }
+}
+
+pub struct FastCommand {
+    address_byte: u8,
+    data_byte_0: u8,
+    data_byte_1: u8,
+
+    powermode: u8,
+}
+
+impl Default for FastCommand {
+    fn default() -> Self {
+        FastCommand {
+            address_byte: DEVICE_ID << 3,
+            powermode: 0,
+            data_byte_0: 0,
+            data_byte_1: 0,
+        }
+    }
+}
+
+impl FastCommand {
+    pub fn bytes(&self) -> [u8; 2] {
+        [self.data_byte_0, self.data_byte_1]
+    }
+
+    pub fn address(mut self, address: u8) -> Self {
+        self.address_byte = (DEVICE_ID << 3) + (address & 0b00000111);
+        self
+    }
+
+    pub fn data(mut self, data: u16) -> Self {
+        self.data_byte_0 = ((data >> 8) as u8) | self.powermode;
+        self.data_byte_1 = data as u8;
+
+        self
+    }
+
+    pub fn power_mode(mut self, mode: PowerMode) -> Self {
+        self.powermode = (mode as u8) << 4;
+        self.data_byte_0 = (self.data_byte_0 & 0x0f) | self.powermode;
+
+        self
     }
 }
 
