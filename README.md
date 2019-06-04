@@ -28,7 +28,7 @@ dac.send(dac_cmd);
 
 ## More information
 - [MCP4725 datasheet](http://ww1.microchip.com/downloads/en/DeviceDoc/22039d.pdf)
-- [API documentation] (https://docs.rs/mcp4725/)
+- [API documentation](https://docs.rs/mcp4725/)
 - [Github repository](https://github.com/mendelt/mcp4725)
 - [Crates.io](https://crates.io/crates/mcp4725)
 
