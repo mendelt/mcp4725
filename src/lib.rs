@@ -32,10 +32,14 @@
 //!
 
 #![no_std]
-
+#[warn(
+    missing_debug_implementations,
+    missing_docs,
+)]
 use core::cmp;
 use embedded_hal::blocking::i2c::Write;
 
+/// MCP4725 DAC driver. Wraps an I2C port and uses it to communicate to send commands to an MCP4725
 pub struct MCP4725<I2C>
 where
     I2C: Write,
@@ -64,13 +68,7 @@ where
 
 const DEVICE_ID: u8 = 0b1100;
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
-#[repr(u8)]
-pub enum CommandType {
-    WriteDac = 0x40,
-    WriteDacAndEEPROM = 0x60,
-}
-
+/// Two bit flags indicating the power mode for the MCP4725
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 #[repr(u8)]
 pub enum PowerMode {
@@ -80,6 +78,20 @@ pub enum PowerMode {
     Resistor500kOhm = 0b11,
 }
 
+/// The type of the command to send for a Command
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[repr(u8)]
+pub enum CommandType {
+    WriteDac = 0x40,
+    WriteDacAndEEPROM = 0x60,
+}
+
+/// A Command to send to the MCP4725, using default() a default instance of this Command can be
+/// created. Using the address(), command_type(), power_mode() and data() builder methods the
+/// parameters for this command can be set. Commands can be sent using the send method on the
+/// MCP4725 driver.
+/// A command can (and should) be re-used. data() can be used to re-set the data while keeping other
+/// parameters the same.
 #[derive(Debug, Eq, PartialEq)]
 pub struct Command {
     address_byte: u8,
@@ -89,6 +101,7 @@ pub struct Command {
 }
 
 impl Default for Command {
+    /// Instantiate a command with sane defaults.
     fn default() -> Self {
         Self {
             address_byte: DEVICE_ID << 3,
@@ -115,6 +128,7 @@ impl Command {
     }
 
     /// Set the 3 bit address
+    /// TODO document where this address can be found for your chip.
     pub fn address(mut self, address: u8) -> Self {
         self.address_byte = (DEVICE_ID << 3) + (address & 0b00000111);
         self
@@ -173,6 +187,14 @@ mod test_command {
     }
 }
 
+/// A FastCommand to send to the MCP4725, using default() a default instance of the FastCommand can
+/// be created. Fast commands are special stripped down commands that can be used to send data to
+/// an MCP4725 in only 2 bytes instead of 3. It can only be used to set the DAC register, not to
+/// write the EEPROM that stores the default values.
+/// As with the normal Command the address(), power_mode() and data() builder methods can be used to
+/// set parameters. FastCommands can be sent using the send_fast method on the MCP4725 driver.
+/// A FastCommand can (and should) be re-used. data() can be used to re-set the data while keeping
+/// other parameters the same.
 pub struct FastCommand {
     address_byte: u8,
     data_byte_0: u8,
@@ -197,11 +219,14 @@ impl FastCommand {
         [self.data_byte_0, self.data_byte_1]
     }
 
+    /// Set the 3 bit address
+    /// TODO document where this address can be found for your chip.
     pub fn address(mut self, address: u8) -> Self {
         self.address_byte = (DEVICE_ID << 3) + (address & 0b00000111);
         self
     }
 
+    /// Set the data to send with this command. This data will be truncated to a 12 bit int
     pub fn data(mut self, data: u16) -> Self {
         self.data_byte_0 = ((data >> 8) as u8) | self.powermode;
         self.data_byte_1 = data as u8;
@@ -209,6 +234,7 @@ impl FastCommand {
         self
     }
 
+    /// Set the power mode
     pub fn power_mode(mut self, mode: PowerMode) -> Self {
         self.powermode = (mode as u8) << 4;
         self.data_byte_0 = (self.data_byte_0 & 0x0f) | self.powermode;
