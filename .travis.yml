@@ -7,9 +7,9 @@ rust:
 
 script:
   - rustup component add rustfmt
-  - cargo fmt --all -- --check
-  - cargo build --verbose --all
-  - cargo test --verbose --all
+  - cargo fmt -- --check
+  - cargo build --verbose
+  - cargo test --verbose
 
 deploy:
   - provider: script
@@ -19,4 +19,3 @@ deploy:
       tags: true
       branch: master
       condition: "$TRAVIS_RUST_VERSION = stable"
-
