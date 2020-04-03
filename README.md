@@ -1,4 +1,4 @@
-# mcp4725 &emsp; [![Build Status](https://travis-ci.org/mendelt/mcp4725.svg?branch=master)](https://travis-ci.org/mendelt/mcp4725)
+# mcp4725 &emsp; [![Build Status](https://travis-ci.com/mendelt/mcp4725.svg?branch=master)](https://travis-ci.com/mendelt/mcp4725)
 
 *Microchip MCP4725 DAC Driver for Rust Embedded HAL*
 This is a driver crate for embedded Rust. It's built on top of the Rust
