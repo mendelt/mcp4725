@@ -1,5 +1,5 @@
 //! *Microchip MCP4725 DAC Driver for Rust Embedded HAL*
-//!This is a driver crate for embedded Rust. It's built on top of the Rust
+//! This is a driver crate for embedded Rust. It's built on top of the Rust
 //! [embedded HAL](https://github.com/rust-embedded/embedded-hal)
 //! It supports sending commands to a MCP4725 DAC over I2C.
 //! To get started you can look at a short
@@ -26,10 +26,16 @@
 //!
 //! ## More information
 //! - [MCP4725 datasheet](http://ww1.microchip.com/downloads/en/DeviceDoc/22039d.pdf)
-//! - [API documentation] (https://docs.rs/mcp4725/)
+//! - [API documentation](https://docs.rs/mcp4725/)
 //! - [Github repository](https://github.com/mendelt/mcp4725)
 //! - [Crates.io](https://crates.io/crates/mcp4725)
 //!
+//! ## Todo
+//! [] Move address to driver, make a0 to a2 configurable
+//! [] Implement read command
+//! [] Implement sending multiple fast commands to the same address
+//! [] Implement general call reset and wake-up if needed
+//! [] Possibly implement high speed mode
 
 #![no_std]
 #[warn(missing_debug_implementations, missing_docs)]
