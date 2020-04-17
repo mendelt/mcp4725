@@ -35,7 +35,7 @@
 #[warn(missing_debug_implementations, missing_docs)]
 use embedded_hal::blocking::i2c::Write;
 
-/// MCP4725 DAC driver. Wraps an I2C port and uses it to communicate to send commands to an MCP4725
+/// MCP4725 DAC driver. Wraps an I2C port to send commands to an MCP4725
 pub struct MCP4725<I2C>
 where
     I2C: Write,
@@ -56,7 +56,7 @@ where
         self.i2c.write(command.address_byte, &command.bytes());
     }
 
-    /// Send a fast command
+    /// Send a fast command to the MCP4725
     pub fn send_fast(&mut self, command: &FastCommand) {
         self.i2c.write(command.address_byte, &command.bytes());
     }
@@ -82,8 +82,8 @@ pub enum CommandType {
     WriteDacAndEEPROM = 0x60,
 }
 
-/// A Command to send to the MCP4725, using default() a default instance of this Command can be
-/// created. Using the address(), command_type(), power_mode() and data() builder methods the
+/// A Command to send to the MCP4725.
+/// Using the address(), command_type(), power_mode() and data() builder methods the
 /// parameters for this command can be set. Commands can be sent using the send method on the
 /// MCP4725 driver.
 /// A command can (and should) be re-used. data() can be used to re-set the data while keeping other
@@ -183,14 +183,12 @@ mod test_command {
     }
 }
 
-/// A FastCommand to send to the MCP4725, using default() a default instance of the FastCommand can
-/// be created. Fast commands are special stripped down commands that can be used to send data to
-/// an MCP4725 in only 2 bytes instead of 3. It can only be used to set the DAC register, not to
-/// write the EEPROM that stores the default values.
+/// A FastCommand to send to the MCP4725.
+/// Fast commands are stripped down commands that can be used to send data in only 2 bytes instead
+/// of 3. It can only be used to set the DAC register. Not to write to the EEPROM that stores the
+/// default values.
 /// As with the normal Command the address(), power_mode() and data() builder methods can be used to
 /// set parameters. FastCommands can be sent using the send_fast method on the MCP4725 driver.
-/// A FastCommand can (and should) be re-used. data() can be used to re-set the data while keeping
-/// other parameters the same.
 pub struct FastCommand {
     address_byte: u8,
     data_byte_0: u8,
