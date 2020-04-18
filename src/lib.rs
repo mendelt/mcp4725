@@ -41,34 +41,58 @@
 #[warn(missing_debug_implementations, missing_docs)]
 use embedded_hal::blocking::i2c::Write;
 
+const DEVICE_ID: u8 = 0b1100000;
+
+fn encode_address(user_address: u8) -> u8 {
+    DEVICE_ID | (user_address & 0b00000111)
+}
+
+#[cfg(test)]
+mod test_address {
+    use super::*;
+
+    #[test]
+    fn should_encode_address_with_device_id() {
+        assert_eq!(encode_address(0b111), 0b01100111);
+    }
+
+    #[test]
+    fn should_ignore_extra_user_bits() {
+        let addr = encode_address(0b11111010);
+        assert_eq!(addr, 0b01100010);
+    }
+}
+
 /// MCP4725 DAC driver. Wraps an I2C port to send commands to an MCP4725
 pub struct MCP4725<I2C>
 where
     I2C: Write,
 {
     i2c: I2C,
+    address: u8,
 }
 
 impl<I2C> MCP4725<I2C>
 where
     I2C: Write,
 {
-    pub fn create(i2c: I2C) -> Self {
-        MCP4725 { i2c }
+    pub fn new(i2c: I2C, user_address: u8) -> Self {
+        MCP4725 {
+            i2c: i2c,
+            address: encode_address(user_address),
+        }
     }
 
     /// Send a command to the MCP4725
     pub fn send(&mut self, command: &Command) {
-        self.i2c.write(command.address_byte, &command.bytes());
+        self.i2c.write(self.address, &command.bytes());
     }
 
     /// Send a fast command to the MCP4725
     pub fn send_fast(&mut self, command: &FastCommand) {
-        self.i2c.write(command.address_byte, &command.bytes());
+        self.i2c.write(self.address, &command.bytes());
     }
 }
-
-const DEVICE_ID: u8 = 0b1100;
 
 /// Two bit flags indicating the power mode for the MCP4725
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -96,7 +120,6 @@ pub enum CommandType {
 /// parameters the same.
 #[derive(Debug, Eq, PartialEq)]
 pub struct Command {
-    address_byte: u8,
     command_byte: u8,
     data_byte_0: u8,
     data_byte_1: u8,
@@ -106,7 +129,6 @@ impl Default for Command {
     /// Instantiate a command with sane defaults.
     fn default() -> Self {
         Self {
-            address_byte: DEVICE_ID << 3,
             command_byte: CommandType::WriteDac as u8,
             data_byte_0: 0,
             data_byte_1: 0,
@@ -129,13 +151,6 @@ impl Command {
         self
     }
 
-    /// Set the 3 bit address
-    /// TODO document where this address can be found for your chip.
-    pub fn address(mut self, address: u8) -> Self {
-        self.address_byte = (DEVICE_ID << 3) + (address & 0b00000111);
-        self
-    }
-
     /// Write the supplied values to the EEPROM as well as to the DAC
     pub fn command_type(mut self, command: CommandType) -> Self {
         self.command_byte = (self.command_byte & 0b00011111) | command as u8;
@@ -152,20 +167,6 @@ impl Command {
 #[cfg(test)]
 mod test_command {
     use super::*;
-
-    #[test]
-    fn should_encode_address_with_device_id() {
-        let cmd = Command::default().address(0b111);
-
-        assert_eq!(cmd.address_byte, 0b01100111);
-    }
-
-    #[test]
-    fn should_ignore_adresses_with_more_than_3_bits() {
-        let cmd = Command::default().address(0b11111010);
-
-        assert_eq!(cmd.address_byte, 0b01100010);
-    }
 
     #[test]
     fn should_encode_data_into_data_bytes() {
@@ -196,7 +197,6 @@ mod test_command {
 /// As with the normal Command the address(), power_mode() and data() builder methods can be used to
 /// set parameters. FastCommands can be sent using the send_fast method on the MCP4725 driver.
 pub struct FastCommand {
-    address_byte: u8,
     data_byte_0: u8,
     data_byte_1: u8,
 
@@ -206,7 +206,6 @@ pub struct FastCommand {
 impl Default for FastCommand {
     fn default() -> Self {
         FastCommand {
-            address_byte: DEVICE_ID << 3,
             powermode: 0,
             data_byte_0: 0,
             data_byte_1: 0,
@@ -217,13 +216,6 @@ impl Default for FastCommand {
 impl FastCommand {
     pub fn bytes(&self) -> [u8; 2] {
         [self.data_byte_0, self.data_byte_1]
-    }
-
-    /// Set the 3 bit address
-    /// TODO document where this address can be found for your chip.
-    pub fn address(mut self, address: u8) -> Self {
-        self.address_byte = (DEVICE_ID << 3) + (address & 0b00000111);
-        self
     }
 
     /// Set the data to send with this command. This data will be truncated to a 12 bit int
@@ -246,20 +238,6 @@ impl FastCommand {
 #[cfg(test)]
 mod test_fast_command {
     use super::*;
-
-    #[test]
-    fn should_encode_address_with_device_id() {
-        let cmd = FastCommand::default().address(0b111);
-
-        assert_eq!(cmd.address_byte, 0b01100111);
-    }
-
-    #[test]
-    fn should_ignore_adresses_with_more_than_3_bits() {
-        let cmd = FastCommand::default().address(0b11111010);
-
-        assert_eq!(cmd.address_byte, 0b01100010);
-    }
 
     #[test]
     fn should_encode_data_into_data_bytes() {
