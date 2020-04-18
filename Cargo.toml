@@ -16,10 +16,3 @@ travis-ci = { repository = "mendelt/mcp4725" }
 
 [dependencies]
 embedded-hal = "0.2.3"
-
-[dev-dependencies]
-cortex-m = "0.6.2"
-cortex-m-rt = "0.6.11"
-cortex-m-semihosting = "0.3.5"
-panic-semihosting = "0.5.3"
-hal = {package = "stm32f1xx-hal", version = "0.5.3", features = ["rt", "stm32f103", "medium"]}
