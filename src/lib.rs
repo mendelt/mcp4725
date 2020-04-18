@@ -31,9 +31,8 @@
 //! - [Crates.io](https://crates.io/crates/mcp4725)
 //!
 //! ## Todo
-//! [] Move address to driver, make a0 to a2 configurable
 //! [] Implement read command
-//! [] Implement sending multiple fast commands to the same address
+//! [] Implement sending multiple consecutive fast commands
 //! [] Implement general call reset and wake-up if needed
 //! [] Possibly implement high speed mode
 
