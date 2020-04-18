@@ -74,7 +74,7 @@ where
 
 impl<I2C, E> MCP4725<I2C>
 where
-    I2C: Write<Error=E>,
+    I2C: Write<Error = E>,
 {
     pub fn new(i2c: I2C, user_address: u8) -> Self {
         MCP4725 {
