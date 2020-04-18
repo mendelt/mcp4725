@@ -100,6 +100,20 @@ where
         self.i2c.write(self.address, &command.bytes())?;
         Ok(())
     }
+
+    /// Send a wake-up command over the I2C bus.
+    /// WARNING: This is a general call command and can wake-up other devices on the bus as well.
+    pub fn wake_up(&mut self) -> Result<(), E> {
+        self.i2c.write(0x00, &[0x06u8])?;
+        Ok(())
+    }
+
+    /// Send a reset command on the I2C bus.
+    /// WARNING: This is a general call command and can reset other devices on the bus as well.
+    pub fn reset(&mut self) -> Result<(), E> {
+        self.i2c.write(0x00, &[0x09u8])?;
+        Ok(())
+    }
 }
 
 /// Two bit flags indicating the power mode for the MCP4725
