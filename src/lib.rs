@@ -2,8 +2,8 @@
 //! This is a driver crate for embedded Rust. It's built on top of the Rust
 //! [embedded HAL](https://github.com/rust-embedded/embedded-hal)
 //! It supports sending commands to a MCP4725 DAC over I2C.
-//! To get started you can look at a short
-//! [example](https://github.com/mendelt/bluepill-examples/blob/master/examples/01-bluepill_saw.rs)
+//! To get started you can look at the
+//! [examples](https://github.com/mendelt/mcp4725/tree/master/bluepill-examples/examples)
 //! on how to use this driver on an inexpensive blue pill STM32F103 board.
 //!
 //! The driver can be initialized by calling create and passing it an I2C interface.
