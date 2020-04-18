@@ -64,7 +64,7 @@ mod test_address {
 }
 
 /// MCP4725 DAC driver. Wraps an I2C port to send commands to an MCP4725
-pub struct MCP4725<I2C>
+pub struct MCP4725<I2C: Write>
 where
     I2C: Write,
 {
@@ -72,9 +72,9 @@ where
     address: u8,
 }
 
-impl<I2C> MCP4725<I2C>
+impl<I2C, E> MCP4725<I2C>
 where
-    I2C: Write,
+    I2C: Write<Error=E>,
 {
     pub fn new(i2c: I2C, user_address: u8) -> Self {
         MCP4725 {
@@ -84,13 +84,15 @@ where
     }
 
     /// Send a command to the MCP4725
-    pub fn send(&mut self, command: &Command) {
-        self.i2c.write(self.address, &command.bytes());
+    pub fn send(&mut self, command: &Command) -> Result<(), E> {
+        self.i2c.write(self.address, &command.bytes())?;
+        Ok(())
     }
 
     /// Send a fast command to the MCP4725
-    pub fn send_fast(&mut self, command: &FastCommand) {
-        self.i2c.write(self.address, &command.bytes());
+    pub fn send_fast(&mut self, command: &FastCommand) -> Result<(), E> {
+        self.i2c.write(self.address, &command.bytes())?;
+        Ok(())
     }
 }
 
