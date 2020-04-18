@@ -75,6 +75,13 @@ impl<I2C, E> MCP4725<I2C>
 where
     I2C: Write<Error = E>,
 {
+    /// Construct a new MCP4725 driver instance.
+    /// i2c is the initialized i2c driver port to use,
+    /// user_address is the three bit user-part of the i2c address where the MCP4725 can be reached
+    ///   - The least significant bit of this address can be set externally by pulling the A0 leg of
+    ///     the chip low (0) or high (1)
+    ///   The two most significant bits are set in the factory. There are four variants of the chip
+    ///     with different addresses.
     pub fn new(i2c: I2C, user_address: u8) -> Self {
         MCP4725 {
             i2c: i2c,
