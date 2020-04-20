@@ -34,8 +34,8 @@ dac.send(dac_cmd);
 
 ## Todo
 [] Implement read command
+[] Create an example writing eeprom
 [] Implement sending multiple consecutive fast commands
-[] Implement general call reset and wake-up if needed
 [] Possibly implement high speed mode
 
 ## License
