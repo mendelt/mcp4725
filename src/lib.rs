@@ -114,6 +114,11 @@ where
         self.i2c.write(0x00, &[0x09u8])?;
         Ok(())
     }
+
+    /// Destroy the MCP4725 driver, return the wrapped I2C
+    pub fn destroy(self) -> I2C {
+        self.i2c
+    }
 }
 
 /// Two bit flags indicating the power mode for the MCP4725
