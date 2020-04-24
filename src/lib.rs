@@ -38,7 +38,7 @@
 
 #![no_std]
 #[warn(missing_debug_implementations, missing_docs)]
-use embedded_hal::blocking::i2c::Write;
+use embedded_hal::blocking::i2c::{Read, Write};
 
 const DEVICE_ID: u8 = 0b1100000;
 
@@ -63,9 +63,9 @@ mod test_address {
 }
 
 /// MCP4725 DAC driver. Wraps an I2C port to send commands to an MCP4725
-pub struct MCP4725<I2C: Write>
+pub struct MCP4725<I2C>
 where
-    I2C: Write,
+    I2C: Read + Write,
 {
     i2c: I2C,
     address: u8,
@@ -73,7 +73,7 @@ where
 
 impl<I2C, E> MCP4725<I2C>
 where
-    I2C: Write<Error = E>,
+    I2C: Read<Error = E> + Write<Error = E>,
 {
     /// Construct a new MCP4725 driver instance.
     /// i2c is the initialized i2c driver port to use,
@@ -98,6 +98,13 @@ where
     /// Send a fast command to the MCP4725
     pub fn send_fast(&mut self, command: &FastCommand) -> Result<(), E> {
         self.i2c.write(self.address, &command.bytes())?;
+        Ok(())
+    }
+
+    pub fn read(mut self) -> Result<(), E> {
+        let mut buffer: [u8; 5] = [0; 5];
+        self.i2c.read(self.address, &mut buffer)?;
+
         Ok(())
     }
 
