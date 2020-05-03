@@ -159,18 +159,30 @@ impl From<[u8; 5]> for Status {
 }
 
 impl Status {
-    // dac_power_down: PowerMode::Normal,
-    // dac_por: false,
-    // dac_data: 0,
-
-    // eeprom_write_status: bytes[0] & 0x80 == 0x80,
-    // eeprom_power_down: PowerMode::Normal,
-    // eeprom_data: 0,
-
     /// Return the eeprom write status. true = completed, false = incomplete
     pub fn eeprom_write_status(&self) -> bool {
         self.bytes[0] & 0x80 == 0x80
     }
+
+    pub fn dac_por(&self) -> bool {
+        self.bytes[0] & 0x40 == 0x40
+    }
+
+    // pub fn dac_power(&self) -> PowerMode {
+    //     ((self.bytes[0] & 0b00000110) >> 1) as PowerMode
+    // }
+
+    // pub fn dac_data(&self) -> u16 {
+    //     (self.bytes[1] as u16 * 512 + self.bytes[2] as u16) >> 4
+    // }
+
+    // pub fn eeprom_power(&self) -> PowerMode {
+    //     (self.bytes[3] & 0b01100000) >> 5
+    // }
+
+    // pub fn eeprom_data(&self) -> u16 {
+    //     (self.bytes[1] & 0x0f) as u16 * 512 + self.bytes[2] as u16
+    // }
 }
 
 #[cfg(test)]
@@ -178,15 +190,21 @@ mod test_status {
     use super::*;
 
     #[test]
-    fn should_parse_eeprom_write_status_completed() {
+    fn should_parse_eeprom_write_status() {
         let status: Status = [0u8, 0u8, 0u8, 0u8, 0u8].into();
         assert_eq!(status.eeprom_write_status(), false);
+
+        let status: Status = [0xffu8, 0u8, 0u8, 0u8, 0u8].into();
+        assert_eq!(status.eeprom_write_status(), true);
     }
 
     #[test]
-    fn should_parse_eeprom_write_status_incomplete() {
-        let status: Status = [0xffu8, 0u8, 0u8, 0u8, 0u8].into();
-        assert_eq!(status.eeprom_write_status(), true);
+    fn should_parse_dac_por() {
+        let status: Status = [0u8, 0u8, 0u8, 0u8, 0u8].into();
+        assert_eq!(status.dac_por(), false);
+
+        let status: Status = [0x40u8, 0u8, 0u8, 0u8, 0u8].into();
+        assert_eq!(status.dac_por(), true);
     }
 }
 
