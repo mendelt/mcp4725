@@ -172,17 +172,18 @@ impl Status {
     //     ((self.bytes[0] & 0b00000110) >> 1) as PowerMode
     // }
 
-    // pub fn dac_data(&self) -> u16 {
-    //     (self.bytes[1] as u16 * 512 + self.bytes[2] as u16) >> 4
-    // }
+    pub fn dac_data(&self) -> u16 {
+        (self.bytes[1] as u16 * 0x0100 + self.bytes[2] as u16) >> 4
+    }
 
     // pub fn eeprom_power(&self) -> PowerMode {
     //     (self.bytes[3] & 0b01100000) >> 5
     // }
 
-    // pub fn eeprom_data(&self) -> u16 {
-    //     (self.bytes[1] & 0x0f) as u16 * 512 + self.bytes[2] as u16
-    // }
+    pub fn eeprom_data(&self) -> u16 {
+        (self.bytes[3] & 0x0f) as u16 * 0x0100 + self.bytes[4] as u16
+        //self.bytes[4] as u16
+    }
 }
 
 #[cfg(test)]
@@ -205,6 +206,25 @@ mod test_status {
 
         let status: Status = [0x40u8, 0u8, 0u8, 0u8, 0u8].into();
         assert_eq!(status.dac_por(), true);
+    }
+
+    #[test]
+    fn should_parse_dac_data() {
+        let status: Status = [0u8, 0u8, 0u8, 0u8, 0u8].into();
+        assert_eq!(status.dac_data(), 0x0000);
+
+        let status: Status = [0u8, 0xffu8, 0xffu8, 0x0f0u8, 0u8].into();
+        assert_eq!(status.dac_data(), 0x0fff);
+    }
+
+
+    #[test]
+    fn should_parse_eeprom_data() {
+        let status: Status = [0u8, 0u8, 0u8, 0u8, 0u8].into();
+        assert_eq!(status.eeprom_data(), 0x0000);
+
+        let status: Status = [0u8, 0u8, 0u8, 0xffu8, 0xffu8].into();
+        assert_eq!(status.eeprom_data(), 0x0fff);
     }
 }
 
