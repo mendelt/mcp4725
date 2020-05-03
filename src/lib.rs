@@ -146,6 +146,50 @@ pub enum CommandType {
     WriteDacAndEEPROM = 0x60,
 }
 
+/// The status of the MCP4725 as read by the read command. Contains the DAC register values and the
+/// values stored in EEPROM
+pub struct Status {
+    bytes: [u8; 5],
+}
+
+impl From<[u8; 5]> for Status {
+    fn from(bytes: [u8; 5]) -> Self {
+        Self { bytes }
+    }
+}
+
+impl Status {
+    // dac_power_down: PowerMode::Normal,
+    // dac_por: false,
+    // dac_data: 0,
+
+    // eeprom_write_status: bytes[0] & 0x80 == 0x80,
+    // eeprom_power_down: PowerMode::Normal,
+    // eeprom_data: 0,
+
+    /// Return the eeprom write status. true = completed, false = incomplete
+    pub fn eeprom_write_status(&self) -> bool {
+        self.bytes[0] & 0x80 == 0x80
+    }
+}
+
+#[cfg(test)]
+mod test_status {
+    use super::*;
+
+    #[test]
+    fn should_parse_eeprom_write_status_completed() {
+        let status: Status = [0u8, 0u8, 0u8, 0u8, 0u8].into();
+        assert_eq!(status.eeprom_write_status(), false);
+    }
+
+    #[test]
+    fn should_parse_eeprom_write_status_incomplete() {
+        let status: Status = [0xffu8, 0u8, 0u8, 0u8, 0u8].into();
+        assert_eq!(status.eeprom_write_status(), true);
+    }
+}
+
 /// A Command to send to the MCP4725.
 /// Using the address(), command_type(), power_mode() and data() builder methods the
 /// parameters for this command can be set. Commands can be sent using the send method on the
