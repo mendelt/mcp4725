@@ -101,11 +101,11 @@ where
         Ok(())
     }
 
-    pub fn read(&mut self) -> Result<[u8; 5], E> {
+    pub fn read(&mut self) -> Result<Status, E> {
         let mut buffer: [u8; 5] = [0; 5];
         self.i2c.read(self.address, &mut buffer)?;
 
-        Ok(buffer)
+        Ok(buffer.into())
     }
 
     /// Send a wake-up command over the I2C bus.
