@@ -217,7 +217,6 @@ mod test_status {
         assert_eq!(status.dac_data(), 0x0fff);
     }
 
-
     #[test]
     fn should_parse_eeprom_data() {
         let status: Status = [0u8, 0u8, 0u8, 0u8, 0u8].into();
