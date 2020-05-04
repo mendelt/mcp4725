@@ -39,6 +39,7 @@
 #![no_std]
 #[warn(missing_debug_implementations, missing_docs)]
 use embedded_hal::blocking::i2c::{Read, Write};
+use num_enum::{IntoPrimitive, UnsafeFromPrimitive};
 
 const DEVICE_ID: u8 = 0b1100000;
 
@@ -129,7 +130,7 @@ where
 }
 
 /// Two bit flags indicating the power mode for the MCP4725
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, IntoPrimitive, PartialEq, UnsafeFromPrimitive)]
 #[repr(u8)]
 pub enum PowerMode {
     Normal = 0b00,
@@ -168,21 +169,28 @@ impl Status {
         self.bytes[0] & 0x40 == 0x40
     }
 
-    // pub fn dac_power(&self) -> PowerMode {
-    //     ((self.bytes[0] & 0b00000110) >> 1) as PowerMode
-    // }
+    pub fn dac_power(&self) -> PowerMode {
+        unsafe {
+            // Should never fail. This distills a two bit value from bytes, PowerMode is defined
+            // for each of the four possible values.
+            PowerMode::from_unchecked((self.bytes[0] & 0b00000110) >> 1)
+        }
+    }
 
     pub fn dac_data(&self) -> u16 {
         (self.bytes[1] as u16 * 0x0100 + self.bytes[2] as u16) >> 4
     }
 
-    // pub fn eeprom_power(&self) -> PowerMode {
-    //     (self.bytes[3] & 0b01100000) >> 5
-    // }
+    pub fn eeprom_power(&self) -> PowerMode {
+        unsafe {
+            // Should never fail. This distills a two bit value from bytes, PowerMode is defined
+            // for each of the four possible values.
+            PowerMode::from_unchecked((self.bytes[3] & 0b01100000) >> 5)
+        }
+    }
 
     pub fn eeprom_data(&self) -> u16 {
         (self.bytes[3] & 0x0f) as u16 * 0x0100 + self.bytes[4] as u16
-        //self.bytes[4] as u16
     }
 }
 
@@ -224,6 +232,23 @@ mod test_status {
 
         let status: Status = [0u8, 0u8, 0u8, 0xffu8, 0xffu8].into();
         assert_eq!(status.eeprom_data(), 0x0fff);
+    }
+
+    fn should_parse_dac_power() {
+        let status: Status = [0u8, 0u8, 0u8, 0u8, 0u8].into();
+        assert_eq!(status.dac_power(), PowerMode::Normal);
+
+        // let status: Status = [0u8, 0u8, 0u8, 0xffu8, 0xffu8].into();
+        // assert_eq!(status.eeprom_data(), 0x0fff);
+    }
+
+    #[test]
+    fn should_parse_eeprom_power() {
+        let status: Status = [0u8, 0u8, 0u8, 0u8, 0u8].into();
+        assert_eq!(status.eeprom_power(), PowerMode::Normal);
+
+        // let status: Status = [0u8, 0u8, 0u8, 0xffu8, 0xffu8].into();
+        // assert_eq!(status.eeprom_data(), 0x0fff);
     }
 }
 
