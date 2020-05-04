@@ -234,12 +234,13 @@ mod test_status {
         assert_eq!(status.eeprom_data(), 0x0fff);
     }
 
+    #[test]
     fn should_parse_dac_power() {
         let status: Status = [0u8, 0u8, 0u8, 0u8, 0u8].into();
         assert_eq!(status.dac_power(), PowerMode::Normal);
 
-        // let status: Status = [0u8, 0u8, 0u8, 0xffu8, 0xffu8].into();
-        // assert_eq!(status.eeprom_data(), 0x0fff);
+        let status: Status = [0b00000100u8, 0u8, 0u8, 0xffu8, 0xffu8].into();
+        assert_eq!(status.dac_power(), PowerMode::Resistor100kOhm);
     }
 
     #[test]
@@ -247,8 +248,8 @@ mod test_status {
         let status: Status = [0u8, 0u8, 0u8, 0u8, 0u8].into();
         assert_eq!(status.eeprom_power(), PowerMode::Normal);
 
-        // let status: Status = [0u8, 0u8, 0u8, 0xffu8, 0xffu8].into();
-        // assert_eq!(status.eeprom_data(), 0x0fff);
+        let status: Status = [0u8, 0u8, 0u8, 0xffu8, 0xffu8].into();
+        assert_eq!(status.eeprom_power(), PowerMode::Resistor500kOhm);
     }
 }
 
