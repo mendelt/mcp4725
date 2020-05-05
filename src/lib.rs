@@ -102,7 +102,7 @@ where
         Ok(())
     }
 
-    pub fn read(&mut self) -> Result<Status, E> {
+    pub fn read(&mut self) -> Result<DacStatus, E> {
         let mut buffer: [u8; 5] = [0; 5];
         self.i2c.read(self.address, &mut buffer)?;
 
@@ -149,27 +149,29 @@ pub enum CommandType {
 
 /// The status of the MCP4725 as read by the read command. Contains the DAC register values and the
 /// values stored in EEPROM
-pub struct Status {
+pub struct DacStatus {
     bytes: [u8; 5],
 }
 
-impl From<[u8; 5]> for Status {
+impl From<[u8; 5]> for DacStatus {
     fn from(bytes: [u8; 5]) -> Self {
         Self { bytes }
     }
 }
 
-impl Status {
-    /// Return the eeprom write status. true = completed, false = incomplete
+impl DacStatus {
+    /// Eeprom write status. true = completed, false = incomplete
     pub fn eeprom_write_status(&self) -> bool {
         self.bytes[0] & 0x80 == 0x80
     }
 
-    pub fn dac_por(&self) -> bool {
+    /// Power on reset state
+    pub fn por(&self) -> bool {
         self.bytes[0] & 0x40 == 0x40
     }
 
-    pub fn dac_power(&self) -> PowerMode {
+    /// Current power mode setting
+    pub fn power(&self) -> PowerMode {
         unsafe {
             // Should never fail. This distills a two bit value from bytes, PowerMode is defined
             // for each of the four possible values.
@@ -177,10 +179,12 @@ impl Status {
         }
     }
 
-    pub fn dac_data(&self) -> u16 {
+    /// Data currently stored in the DAC register
+    pub fn data(&self) -> u16 {
         (self.bytes[1] as u16 * 0x0100 + self.bytes[2] as u16) >> 4
     }
 
+    /// Power mode stored in eeprom
     pub fn eeprom_power(&self) -> PowerMode {
         unsafe {
             // Should never fail. This distills a two bit value from bytes, PowerMode is defined
@@ -189,6 +193,7 @@ impl Status {
         }
     }
 
+    /// Data stored in eeprom
     pub fn eeprom_data(&self) -> u16 {
         (self.bytes[3] & 0x0f) as u16 * 0x0100 + self.bytes[4] as u16
     }
@@ -200,55 +205,55 @@ mod test_status {
 
     #[test]
     fn should_parse_eeprom_write_status() {
-        let status: Status = [0u8, 0u8, 0u8, 0u8, 0u8].into();
+        let status: DacStatus = [0u8, 0u8, 0u8, 0u8, 0u8].into();
         assert_eq!(status.eeprom_write_status(), false);
 
-        let status: Status = [0xffu8, 0u8, 0u8, 0u8, 0u8].into();
+        let status: DacStatus = [0xffu8, 0u8, 0u8, 0u8, 0u8].into();
         assert_eq!(status.eeprom_write_status(), true);
     }
 
     #[test]
     fn should_parse_dac_por() {
-        let status: Status = [0u8, 0u8, 0u8, 0u8, 0u8].into();
-        assert_eq!(status.dac_por(), false);
+        let status: DacStatus = [0u8, 0u8, 0u8, 0u8, 0u8].into();
+        assert_eq!(status.por(), false);
 
-        let status: Status = [0x40u8, 0u8, 0u8, 0u8, 0u8].into();
-        assert_eq!(status.dac_por(), true);
+        let status: DacStatus = [0x40u8, 0u8, 0u8, 0u8, 0u8].into();
+        assert_eq!(status.por(), true);
     }
 
     #[test]
     fn should_parse_dac_data() {
-        let status: Status = [0u8, 0u8, 0u8, 0u8, 0u8].into();
-        assert_eq!(status.dac_data(), 0x0000);
+        let status: DacStatus = [0u8, 0u8, 0u8, 0u8, 0u8].into();
+        assert_eq!(status.data(), 0x0000);
 
-        let status: Status = [0u8, 0xffu8, 0xffu8, 0x0f0u8, 0u8].into();
-        assert_eq!(status.dac_data(), 0x0fff);
+        let status: DacStatus = [0u8, 0xffu8, 0xffu8, 0x0f0u8, 0u8].into();
+        assert_eq!(status.data(), 0x0fff);
     }
 
     #[test]
     fn should_parse_eeprom_data() {
-        let status: Status = [0u8, 0u8, 0u8, 0u8, 0u8].into();
+        let status: DacStatus = [0u8, 0u8, 0u8, 0u8, 0u8].into();
         assert_eq!(status.eeprom_data(), 0x0000);
 
-        let status: Status = [0u8, 0u8, 0u8, 0xffu8, 0xffu8].into();
+        let status: DacStatus = [0u8, 0u8, 0u8, 0xffu8, 0xffu8].into();
         assert_eq!(status.eeprom_data(), 0x0fff);
     }
 
     #[test]
     fn should_parse_dac_power() {
-        let status: Status = [0u8, 0u8, 0u8, 0u8, 0u8].into();
-        assert_eq!(status.dac_power(), PowerMode::Normal);
+        let status: DacStatus = [0u8, 0u8, 0u8, 0u8, 0u8].into();
+        assert_eq!(status.power(), PowerMode::Normal);
 
-        let status: Status = [0b00000100u8, 0u8, 0u8, 0xffu8, 0xffu8].into();
-        assert_eq!(status.dac_power(), PowerMode::Resistor100kOhm);
+        let status: DacStatus = [0b00000100u8, 0u8, 0u8, 0xffu8, 0xffu8].into();
+        assert_eq!(status.power(), PowerMode::Resistor100kOhm);
     }
 
     #[test]
     fn should_parse_eeprom_power() {
-        let status: Status = [0u8, 0u8, 0u8, 0u8, 0u8].into();
+        let status: DacStatus = [0u8, 0u8, 0u8, 0u8, 0u8].into();
         assert_eq!(status.eeprom_power(), PowerMode::Normal);
 
-        let status: Status = [0u8, 0u8, 0u8, 0xffu8, 0xffu8].into();
+        let status: DacStatus = [0u8, 0u8, 0u8, 0xffu8, 0xffu8].into();
         assert_eq!(status.eeprom_power(), PowerMode::Resistor500kOhm);
     }
 }
