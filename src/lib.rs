@@ -35,11 +35,13 @@
 //! [] Create an example writing eeprom
 //! [] Implement sending multiple consecutive fast commands
 //! [] Possibly implement high speed mode
-
 #![no_std]
-#[warn(missing_debug_implementations, missing_docs)]
+
+use core::fmt::Debug;
 use embedded_hal::blocking::i2c::{Read, Write};
 use num_enum::{IntoPrimitive, UnsafeFromPrimitive};
+
+#[warn(missing_debug_implementations, missing_docs)]
 
 const DEVICE_ID: u8 = 0b1100000;
 
@@ -156,6 +158,20 @@ pub struct DacStatus {
 impl From<[u8; 5]> for DacStatus {
     fn from(bytes: [u8; 5]) -> Self {
         Self { bytes }
+    }
+}
+
+impl Debug for DacStatus {
+    fn fmt(&self, formatter: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        formatter
+            .debug_struct("Point")
+            .field("power", &self.power())
+            .field("data", &self.data())
+            .field("por", &self.por())
+            .field("eeprom_write_status", &self.eeprom_write_status())
+            .field("eeprom_data", &self.eeprom_data())
+            .field("eeprom_power", &self.eeprom_power())
+            .finish()
     }
 }
 
