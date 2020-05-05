@@ -104,6 +104,7 @@ where
         Ok(())
     }
 
+    /// Send read command and return the dac status
     pub fn read(&mut self) -> Result<DacStatus, E> {
         let mut buffer: [u8; 5] = [0; 5];
         self.i2c.read(self.address, &mut buffer)?;
