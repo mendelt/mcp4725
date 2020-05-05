@@ -151,6 +151,7 @@ pub enum CommandType {
 
 /// The status of the MCP4725 as read by the read command. Contains the DAC register values and the
 /// values stored in EEPROM
+#[derive(Copy, Clone, Eq, PartialEq)]
 pub struct DacStatus {
     bytes: [u8; 5],
 }
