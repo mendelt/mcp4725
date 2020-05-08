@@ -91,6 +91,21 @@ where
         }
     }
 
+    /// Set the dac register
+    pub fn set_dac(_power: PowerDown, _data: u16) -> Result<(), E> {
+        Ok(())
+    }
+
+    /// Set the dac and eeprom registers
+    pub fn set_dac_and_eeprom(_power: PowerDown, _data: u16) -> Result<(), E> {
+        Ok(())
+    }
+
+    /// Use the two byte fast command to set the dac register
+    pub fn set_dac_fast(_power: PowerDown, _data: u16) -> Result<(), E> {
+        Ok(())
+    }
+
     /// Send a command to the MCP4725
     pub fn send(&mut self, command: &Command) -> Result<(), E> {
         self.i2c.write(self.address, &command.bytes())?;
