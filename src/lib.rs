@@ -39,7 +39,6 @@
 
 use core::fmt::Debug;
 use embedded_hal::blocking::i2c::{Read, Write};
-use num_enum::{IntoPrimitive, UnsafeFromPrimitive};
 
 #[warn(missing_debug_implementations, missing_docs)]
 
@@ -133,13 +132,25 @@ where
 }
 
 /// Two bit flags indicating the power mode for the MCP4725
-#[derive(Debug, Copy, Clone, Eq, IntoPrimitive, PartialEq, UnsafeFromPrimitive)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 #[repr(u8)]
 pub enum PowerMode {
     Normal = 0b00,
     Resistor1kOhm = 0b01,
     Resistor100kOhm = 0b10,
     Resistor500kOhm = 0b11,
+}
+
+impl From<u8> for PowerMode {
+    fn from(mode: u8) -> Self {
+        match mode {
+            0b00 => PowerMode::Normal,
+            0b01 => PowerMode::Resistor1kOhm,
+            0b10 => PowerMode::Resistor100kOhm,
+            0b11 => PowerMode::Resistor500kOhm,
+            _ => panic!("Invalid powermode"),
+        }
+    }
 }
 
 /// The type of the command to send for a Command
@@ -190,11 +201,9 @@ impl DacStatus {
 
     /// Current power mode setting
     pub fn power(&self) -> PowerMode {
-        unsafe {
-            // Should never fail. This distills a two bit value from bytes, PowerMode is defined
-            // for each of the four possible values.
-            PowerMode::from_unchecked((self.bytes[0] & 0b00000110) >> 1)
-        }
+        // Should never fail. This distills a two bit value from bytes, PowerMode is defined
+        // for each of the four possible values.
+        ((self.bytes[0] & 0b00000110) >> 1).into()
     }
 
     /// Data currently stored in the DAC register
@@ -204,11 +213,9 @@ impl DacStatus {
 
     /// Power mode stored in eeprom
     pub fn eeprom_power(&self) -> PowerMode {
-        unsafe {
-            // Should never fail. This distills a two bit value from bytes, PowerMode is defined
-            // for each of the four possible values.
-            PowerMode::from_unchecked((self.bytes[3] & 0b01100000) >> 5)
-        }
+        // Should never fail. This distills a two bit value from bytes, PowerMode is defined
+        // for each of the four possible values.
+        ((self.bytes[3] & 0b01100000) >> 5).into()
     }
 
     /// Data stored in eeprom

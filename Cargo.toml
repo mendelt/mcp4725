@@ -16,4 +16,3 @@ travis-ci = { repository = "mendelt/mcp4725" }
 
 [dependencies]
 embedded-hal = "0.2.3"
-num_enum = "0.4.3"
