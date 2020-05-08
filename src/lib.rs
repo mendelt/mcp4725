@@ -131,24 +131,24 @@ where
     }
 }
 
-/// Two bit flags indicating the power mode for the MCP4725
+/// Two bit flags indicating the power down mode for the MCP4725
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 #[repr(u8)]
-pub enum PowerMode {
+pub enum PowerDown {
     Normal = 0b00,
     Resistor1kOhm = 0b01,
     Resistor100kOhm = 0b10,
     Resistor500kOhm = 0b11,
 }
 
-impl From<u8> for PowerMode {
+impl From<u8> for PowerDown {
     fn from(mode: u8) -> Self {
         match mode {
-            0b00 => PowerMode::Normal,
-            0b01 => PowerMode::Resistor1kOhm,
-            0b10 => PowerMode::Resistor100kOhm,
-            0b11 => PowerMode::Resistor500kOhm,
-            _ => panic!("Invalid powermode"),
+            0b00 => PowerDown::Normal,
+            0b01 => PowerDown::Resistor1kOhm,
+            0b10 => PowerDown::Resistor100kOhm,
+            0b11 => PowerDown::Resistor500kOhm,
+            _ => panic!("Invalid powerdown value"),
         }
     }
 }
@@ -178,12 +178,12 @@ impl Debug for DacStatus {
     fn fmt(&self, formatter: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         formatter
             .debug_struct("Point")
-            .field("power", &self.power())
+            .field("power_down", &self.power_down())
             .field("data", &self.data())
             .field("por", &self.por())
             .field("eeprom_write_status", &self.eeprom_write_status())
             .field("eeprom_data", &self.eeprom_data())
-            .field("eeprom_power", &self.eeprom_power())
+            .field("eeprom_power_down", &self.eeprom_power_down())
             .finish()
     }
 }
@@ -200,7 +200,7 @@ impl DacStatus {
     }
 
     /// Current power mode setting
-    pub fn power(&self) -> PowerMode {
+    pub fn power_down(&self) -> PowerDown {
         // Should never fail. This distills a two bit value from bytes, PowerMode is defined
         // for each of the four possible values.
         ((self.bytes[0] & 0b00000110) >> 1).into()
@@ -212,7 +212,7 @@ impl DacStatus {
     }
 
     /// Power mode stored in eeprom
-    pub fn eeprom_power(&self) -> PowerMode {
+    pub fn eeprom_power_down(&self) -> PowerDown {
         // Should never fail. This distills a two bit value from bytes, PowerMode is defined
         // for each of the four possible values.
         ((self.bytes[3] & 0b01100000) >> 5).into()
@@ -265,21 +265,21 @@ mod test_status {
     }
 
     #[test]
-    fn should_parse_dac_power() {
+    fn should_parse_dac_power_down() {
         let status: DacStatus = [0u8, 0u8, 0u8, 0u8, 0u8].into();
-        assert_eq!(status.power(), PowerMode::Normal);
+        assert_eq!(status.power_down(), PowerDown::Normal);
 
         let status: DacStatus = [0b00000100u8, 0u8, 0u8, 0xffu8, 0xffu8].into();
-        assert_eq!(status.power(), PowerMode::Resistor100kOhm);
+        assert_eq!(status.power_down(), PowerDown::Resistor100kOhm);
     }
 
     #[test]
     fn should_parse_eeprom_power() {
         let status: DacStatus = [0u8, 0u8, 0u8, 0u8, 0u8].into();
-        assert_eq!(status.eeprom_power(), PowerMode::Normal);
+        assert_eq!(status.eeprom_power_down(), PowerDown::Normal);
 
         let status: DacStatus = [0u8, 0u8, 0u8, 0xffu8, 0xffu8].into();
-        assert_eq!(status.eeprom_power(), PowerMode::Resistor500kOhm);
+        assert_eq!(status.eeprom_power_down(), PowerDown::Resistor500kOhm);
     }
 }
 
@@ -329,7 +329,7 @@ impl Command {
     }
 
     /// Set the power mode
-    pub fn power_mode(mut self, mode: PowerMode) -> Self {
+    pub fn power_mode(mut self, mode: PowerDown) -> Self {
         self.command_byte = (self.command_byte & 0b11111000) | ((mode as u8) << 1);
         self
     }
@@ -348,7 +348,7 @@ mod test_command {
 
     #[test]
     fn should_encode_power_mode_into_data_bytes() {
-        let cmd = Command::default().power_mode(PowerMode::Resistor1kOhm);
+        let cmd = Command::default().power_mode(PowerDown::Resistor1kOhm);
 
         assert_eq!(cmd.bytes(), [0b01000010, 0, 0])
     }
@@ -398,7 +398,7 @@ impl FastCommand {
     }
 
     /// Set the power mode
-    pub fn power_mode(mut self, mode: PowerMode) -> Self {
+    pub fn power_mode(mut self, mode: PowerDown) -> Self {
         self.powermode = (mode as u8) << 4;
         self.data_byte_0 = (self.data_byte_0 & 0x0f) | self.powermode;
 
@@ -419,7 +419,7 @@ mod test_fast_command {
 
     #[test]
     fn should_encode_powermode_into_data_bytes() {
-        let cmd = FastCommand::default().power_mode(PowerMode::Resistor500kOhm);
+        let cmd = FastCommand::default().power_mode(PowerDown::Resistor500kOhm);
 
         assert_eq!(cmd.bytes(), [0b00110000, 0])
     }
