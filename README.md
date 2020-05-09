@@ -8,15 +8,17 @@ To get started you can look at the
 [examples](https://github.com/mendelt/mcp4725/tree/master/bluepill-examples/examples)
 on how to use this driver on an inexpensive blue pill STM32F103 board.
 
-The driver can be initialized by calling create and passing it an I2C interface.
+The driver can be initialized by calling create and passing it an I2C interface. The three least
+significant bits of the device address (A2, A1 and A0) also need to be specified. A2 and A1 are
+set in the device. A0 can be set by pulling the corresponding connection on the device high or
+low.
 ```rust, ignore
-let mut dac = MCP4725::create(i2c);
+let mut dac = MCP4725::new(i2c, 0b010);
 ```
 
-A command can then be created and initialized with the device address and some data, and sent
-the DAC.
+A command can then be created and initialized with data, and sent to the DAC.
 ```rust, ignore
-let mut dac_cmd = Command::default().address(0b111).data(14);
+let mut dac_cmd = Command::default().data(14);
 dac.send(dac_cmd);
 ```
 
@@ -33,10 +35,8 @@ dac.send(dac_cmd);
 - [Crates.io](https://crates.io/crates/mcp4725)
 
 ## Todo
-[] Implement read command
 [] Create an example writing eeprom
 [] Implement sending multiple consecutive fast commands
-[] Possibly implement high speed mode
 
 ## License
 

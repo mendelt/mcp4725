@@ -33,10 +33,8 @@
 //! - [Crates.io](https://crates.io/crates/mcp4725)
 //!
 //! ## Todo
-//! [] Implement read command
 //! [] Create an example writing eeprom
 //! [] Implement sending multiple consecutive fast commands
-//! [] Possibly implement high speed mode
 #![no_std]
 
 mod encode;
