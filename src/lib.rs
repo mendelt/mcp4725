@@ -86,19 +86,30 @@ where
     ///     with different addresses.
     pub fn new(i2c: I2C, user_address: u8) -> Self {
         MCP4725 {
-            i2c: i2c,
+            i2c,
             address: encode_address(user_address),
         }
     }
 
     /// Set the dac register
-    pub fn set_dac(&mut self, _power: PowerDown, _data: u16) -> Result<(), E> { 
-        Ok(())
+    pub fn set_dac(&mut self, power: PowerDown, data: u16) -> Result<(), E> {
+        self.send_command(CommandType::WriteDac, power, data)
     }
 
     /// Set the dac and eeprom registers
-    pub fn set_dac_and_eeprom(&mut self, _power: PowerDown, _data: u16) -> Result<(), E> {
-        Ok(())
+    pub fn set_dac_and_eeprom(&mut self, power: PowerDown, data: u16) -> Result<(), E> {
+        self.send_command(CommandType::WriteDacAndEEPROM, power, data)
+    }
+
+    fn send_command(&mut self, command: CommandType, power: PowerDown, data: u16) -> Result<(), E> {
+        self.i2c.write(
+            self.address,
+            &[
+                command as u8 + (power as u8) << 1,
+                (data >> 4) as u8,
+                (data & 0x000f << 4) as u8,
+            ],
+        )
     }
 
     /// Use the two byte fast command to set the dac register
