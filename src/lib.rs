@@ -14,16 +14,15 @@
 //! let mut dac = MCP4725::new(i2c, 0b010);
 //! ```
 //!
-//! A command can then be created and initialized with data, and sent to the DAC.
+//! To set the dac output and powermode the dac register can be set;
 //! ```rust, ignore
-//! let mut dac_cmd = Command::default().data(14);
-//! dac.send(dac_cmd);
+//! dac.set_dac(PowerDown::Normal, 0x0fff);
 //! ```
 //!
-//! New data can be sent using the existing command by just changing the data and re-sending.
+//! The MCP4725 also has a built in eeprom to store the value of the dac register needs to have the
+//! next time the device is powered on;
 //! ```rust, ignore
-//! dac_cmd = dac_cmd.data(348);
-//! dac.send(dac_cmd);
+//! dac.set_dac_and_eeprom(PowerDown::Resistor100kOhm, 0x0fff);
 //! ```
 //!
 //! ## More information
