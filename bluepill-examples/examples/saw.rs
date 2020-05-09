@@ -4,6 +4,7 @@
 #![no_std]
 
 use cortex_m_rt::entry;
+use cortex_m_semihosting::hprintln;
 use hal::i2c::{BlockingI2c, Mode};
 use hal::pac;
 use hal::prelude::*;
@@ -48,14 +49,11 @@ fn main() -> ! {
     // Configure the MCP4725 DAC
     let mut dac = MCP4725::new(i2c, 0b010);
 
-    // Create the dac command and set it to the right address
-    let mut dac_cmd = Command::default();
-
     // Slowly increase the output of the DAC to it's maximum value, then start over
     let mut value: u16 = 0;
     loop {
-        dac_cmd = dac_cmd.data(value);
-        dac.send(&dac_cmd);
+        dac.set_dac(PowerDown::Normal, value);
+
         value += 1;
         value &= 0x0fff;
     }
