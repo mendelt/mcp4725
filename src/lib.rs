@@ -92,17 +92,17 @@ where
     }
 
     /// Set the dac register
-    pub fn set_dac(_power: PowerDown, _data: u16) -> Result<(), E> {
+    pub fn set_dac(&mut self, _power: PowerDown, _data: u16) -> Result<(), E> { 
         Ok(())
     }
 
     /// Set the dac and eeprom registers
-    pub fn set_dac_and_eeprom(_power: PowerDown, _data: u16) -> Result<(), E> {
+    pub fn set_dac_and_eeprom(&mut self, _power: PowerDown, _data: u16) -> Result<(), E> {
         Ok(())
     }
 
     /// Use the two byte fast command to set the dac register
-    pub fn set_dac_fast(_power: PowerDown, _data: u16) -> Result<(), E> {
+    pub fn set_dac_fast(&mut self, _power: PowerDown, _data: u16) -> Result<(), E> {
         Ok(())
     }
 
