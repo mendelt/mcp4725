@@ -103,6 +103,7 @@ mod test_address {
 }
 
 /// MCP4725 DAC driver. Wraps an I2C port to send commands to an MCP4725
+#[derive(Debug)]
 pub struct MCP4725<I2C>
 where
     I2C: Read + Write,
