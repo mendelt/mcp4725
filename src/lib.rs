@@ -41,7 +41,7 @@ mod status;
 
 use core::fmt::Debug;
 use embedded_hal::blocking::i2c::{Read, Write};
-use encode::{encode_address, encode_command};
+use encode::{encode_address, encode_command, encode_fast_command};
 pub use status::DacStatus;
 
 #[warn(missing_debug_implementations, missing_docs)]
@@ -87,8 +87,9 @@ where
     }
 
     /// Use the two byte fast command to set the dac register
-    pub fn set_dac_fast(&mut self, _power: PowerDown, _data: u16) -> Result<(), E> {
-        Ok(())
+    pub fn set_dac_fast(&mut self, power: PowerDown, data: u16) -> Result<(), E> {
+        let bytes = encode_fast_command(power, data);
+        self.i2c.write(self.address, &bytes)
     }
 
     /// Send a command to the MCP4725

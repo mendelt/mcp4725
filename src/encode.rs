@@ -19,6 +19,14 @@ pub fn encode_command(command: CommandType, power: PowerDown, data: u16) -> [u8;
     ]
 }
 
+/// Encode powerdown mode and data into a two byte fast command
+pub fn encode_fast_command(power: PowerDown, data: u16) -> [u8; 2] {
+    [
+        (power as u8) << 4 | ((data & 0x0fff) >> 8) as u8,
+        data as u8,
+    ]
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -56,9 +64,30 @@ mod test {
     }
 
     #[test]
-    fn should_encode_command_type_into_data_bytes() {
+    fn should_encode_command_type() {
         let bytes = encode_command(CommandType::WriteDacAndEEPROM, PowerDown::Normal, 0);
 
         assert_eq!(bytes, [0b01100000, 0, 0])
+    }
+
+    #[test]
+    fn should_encode_fastcommand_command_data() {
+        let bytes = encode_fast_command(PowerDown::Normal, 0x0877);
+
+        assert_eq!(bytes, [0b00001000, 0b01110111])
+    }
+
+    #[test]
+    fn should_not_encode_fastcommand_command_data_over_12bits() {
+        let bytes = encode_fast_command(PowerDown::Normal, 0xff77);
+
+        assert_eq!(bytes, [0b00001111, 0b01110111])
+    }
+
+    #[test]
+    fn should_encode_fastcommand_powermode_into_data_bytes() {
+        let bytes = encode_fast_command(PowerDown::Resistor500kOhm, 0x0000);
+
+        assert_eq!(bytes, [0b00110000, 0b00000000])
     }
 }
