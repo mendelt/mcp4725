@@ -1,4 +1,7 @@
-//! MPC4725 for the stm32f103. It uses the I2C 1 interface on pins pb8 and pb9 to control the DAC
+//! This example shows writing the dac and eeprom and then using the read method to read back the
+//! written values. 
+//! It calls read right after the set_dac_and_eeprom command to show that the eeprom_write_status is
+//! still false when writing. After the eeprom has been written the status turns to true.
 
 #![no_main]
 #![no_std]
@@ -49,17 +52,16 @@ fn main() -> ! {
     // Configure the MCP4725 DAC
     let mut dac = MCP4725::new(i2c, 0b010);
 
-    let buffer = dac.read().unwrap();
-    hprintln!("{:x?}", buffer);
+    hprintln!("old status {:x?}", dac.read().unwrap()).unwrap();
 
     // Set the output
-    dac.send_fast(&FastCommand::default().data(0x0112)).unwrap();
+    dac.set_dac_and_eeprom(PowerDown::Resistor100kOhm, 0x0112).unwrap();
 
-    let buffer = dac.read().unwrap();
-    hprintln!("{:x?}", buffer);
+    // This probably prints eeprom still writing
+    hprintln!("new status {:x?}", dac.read().unwrap()).unwrap();
 
-    // Reset the chip to set the output low again
-    dac.reset().unwrap();
+    // This prints eeprom done writing
+    hprintln!("new new status {:x?}", dac.read().unwrap()).unwrap();
 
     loop {}
 }
