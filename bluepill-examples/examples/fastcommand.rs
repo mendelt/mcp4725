@@ -49,12 +49,8 @@ fn main() -> ! {
     // Configure the MCP4725 DAC
     let mut dac = MCP4725::new(i2c, 0b010);
 
-    // Slowly decrease the output of the DAC to its minimum value, then start over
-    let cmd_high = FastCommand::default().data(0x0fff);
-    let cmd_low = FastCommand::default().data(0x0000);
-
     loop {
-        dac.send_fast(&cmd_high);
-        dac.send_fast(&cmd_low);
+        dac.set_dac_fast(PowerDown::Normal, 0x0fff);
+        dac.set_dac_fast(PowerDown::Normal, 0x0000);
     }
 }
