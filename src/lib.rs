@@ -19,8 +19,8 @@
 //! dac.set_dac(PowerDown::Normal, 0x0fff);
 //! ```
 //!
-//! The MCP4725 also has a built in eeprom to store the value of the dac register needs to have the
-//! next time the device is powered on;
+//! The MCP4725 has a built in eeprom that is used to initialize the dac register on power up.
+//! The values in the eeprom can be set with the `set_dac_and_eeprom` method;
 //! ```rust, ignore
 //! dac.set_dac_and_eeprom(PowerDown::Resistor100kOhm, 0x0fff);
 //! ```
