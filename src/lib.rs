@@ -31,9 +31,6 @@
 //! - [Github repository](https://github.com/mendelt/mcp4725)
 //! - [Crates.io](https://crates.io/crates/mcp4725)
 //!
-//! ## Todo
-//! [] Create an example writing eeprom
-//! [] Implement sending multiple consecutive fast commands
 #![no_std]
 
 mod encode;
