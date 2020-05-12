@@ -10,18 +10,29 @@
 //! significant bits of the device address (A2, A1 and A0) also need to be specified. A2 and A1 are
 //! set in the device. A0 can be set by pulling the corresponding connection on the device high or
 //! low.
-//! ```rust, ignore
+//! ```
+//! # use embedded_hal_mock::i2c::Mock;
+//! # use mcp4725::*;
+//! # let mut i2c = Mock::new(&[]);
 //! let mut dac = MCP4725::new(i2c, 0b010);
 //! ```
 //!
 //! To set the dac output and powermode the dac register can be set;
-//! ```rust, ignore
+//! ```
+//! # use embedded_hal_mock::i2c::{Mock, Transaction};
+//! # use mcp4725::*;
+//! # let mut i2c = Mock::new(&[Transaction::write(98, vec![0x40, 0xff, 0xf0]),]);
+//! # let mut dac = MCP4725::new(i2c, 0b010);
 //! dac.set_dac(PowerDown::Normal, 0x0fff);
 //! ```
 //!
 //! The MCP4725 has a built in eeprom that is used to initialize the dac register on power up.
 //! The values in the eeprom can be set with the `set_dac_and_eeprom` method;
-//! ```rust, ignore
+//! ```
+//! # use embedded_hal_mock::i2c::{Mock, Transaction};
+//! # use mcp4725::*;
+//! # let mut i2c = Mock::new(&[Transaction::write(98, vec![0x64, 0xff, 0xf0])]);
+//! # let mut dac = MCP4725::new(i2c, 0b010);
 //! dac.set_dac_and_eeprom(PowerDown::Resistor100kOhm, 0x0fff);
 //! ```
 //!
