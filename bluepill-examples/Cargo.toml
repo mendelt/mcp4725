@@ -1,6 +1,6 @@
 [package]
 name = "bluepill-examples"
-version = "0.2.2"
+version = "0.3.0"
 authors = ["Mendelt Siebenga <msiebenga@gmail.com>"]
 edition = "2018"
 
