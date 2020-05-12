@@ -185,10 +185,6 @@ pub enum CommandType {
 /// A command can (and should) be re-used. data() can be used to re-set the data while keeping other
 /// parameters the same.
 #[derive(Debug, Eq, PartialEq)]
-#[deprecated(
-    since = "0.3.0",
-    note = "Please use the MCP4725::set_dac and MCP4725::set_dac_and_eeprom methods instead"
-)]
 pub struct Command {
     command_byte: u8,
     data_byte_0: u8,
@@ -266,10 +262,6 @@ mod test_command {
 /// default values.
 /// As with the normal Command the address(), power_mode() and data() builder methods can be used to
 /// set parameters. FastCommands can be sent using the send_fast method on the MCP4725 driver.
-#[deprecated(
-    since = "0.3.0",
-    note = "Please use the MCP4725::set_dac_fast method instead"
-)]
 pub struct FastCommand {
     data_byte_0: u8,
     data_byte_1: u8,
