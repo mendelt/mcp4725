@@ -4,6 +4,9 @@ rust:
   - stable
   - beta
   - nightly
+jobs:
+  allow_failures:
+    - rust: nightly
 
 script:
   - rustup component add rustfmt
