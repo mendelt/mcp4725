@@ -49,7 +49,7 @@ mod encode;
 mod status;
 
 use core::fmt::Debug;
-use embedded_hal::blocking::i2c::{Read, Write};
+use embedded_hal::i2c::blocking::{Read, Write};
 use encode::{encode_address, encode_command, encode_fast_command};
 pub use status::DacStatus;
 
