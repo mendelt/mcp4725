@@ -84,25 +84,25 @@ where
     /// Set the dac register
     pub fn set_dac(&mut self, power: PowerDown, data: u16) -> Result<(), E> {
         let bytes = encode_command(CommandType::WriteDac, power, data);
-        self.i2c.write(self.address, &bytes)
+        self.i2c.try_write(self.address, &bytes)
     }
 
     /// Set the dac and eeprom registers
     pub fn set_dac_and_eeprom(&mut self, power: PowerDown, data: u16) -> Result<(), E> {
         let bytes = encode_command(CommandType::WriteDacAndEEPROM, power, data);
-        self.i2c.write(self.address, &bytes)
+        self.i2c.try_write(self.address, &bytes)
     }
 
     /// Use the two byte fast command to set the dac register
     pub fn set_dac_fast(&mut self, power: PowerDown, data: u16) -> Result<(), E> {
         let bytes = encode_fast_command(power, data);
-        self.i2c.write(self.address, &bytes)
+        self.i2c.try_write(self.address, &bytes)
     }
 
     /// Send read command and return the dac status
     pub fn read(&mut self) -> Result<DacStatus, E> {
         let mut buffer: [u8; 5] = [0; 5];
-        self.i2c.read(self.address, &mut buffer)?;
+        self.i2c.try_read(self.address, &mut buffer)?;
 
         Ok(buffer.into())
     }
@@ -110,14 +110,14 @@ where
     /// Send a wake-up command over the I2C bus.
     /// WARNING: This is a general call command and can wake-up other devices on the bus as well.
     pub fn wake_up(&mut self) -> Result<(), E> {
-        self.i2c.write(0x00, &[0x06u8])?;
+        self.i2c.try_write(0x00, &[0x06u8])?;
         Ok(())
     }
 
     /// Send a reset command on the I2C bus.
     /// WARNING: This is a general call command and can reset other devices on the bus as well.
     pub fn reset(&mut self) -> Result<(), E> {
-        self.i2c.write(0x00, &[0x09u8])?;
+        self.i2c.try_write(0x00, &[0x09u8])?;
         Ok(())
     }
 
