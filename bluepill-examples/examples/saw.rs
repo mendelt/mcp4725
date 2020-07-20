@@ -4,7 +4,6 @@
 #![no_std]
 
 use cortex_m_rt::entry;
-use cortex_m_semihosting::hprintln;
 use hal::i2c::{BlockingI2c, Mode};
 use hal::pac;
 use hal::prelude::*;
