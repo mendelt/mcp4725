@@ -51,7 +51,7 @@ fn main() -> ! {
     // Slowly increase the output of the DAC to it's maximum value, then start over
     let mut value: u16 = 0;
     loop {
-        dac.set_dac(PowerDown::Normal, value);
+        dac.set_dac(PowerDown::Normal, value).ok();
 
         value += 1;
         value &= 0x0fff;

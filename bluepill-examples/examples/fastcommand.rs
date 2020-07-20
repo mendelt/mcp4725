@@ -50,7 +50,7 @@ fn main() -> ! {
     let mut dac = MCP4725::new(i2c, 0b010);
 
     loop {
-        dac.set_dac_fast(PowerDown::Normal, 0x0fff);
-        dac.set_dac_fast(PowerDown::Normal, 0x0000);
+        dac.set_dac_fast(PowerDown::Normal, 0x0fff).ok();
+        dac.set_dac_fast(PowerDown::Normal, 0x0000).ok();
     }
 }

@@ -1,5 +1,5 @@
 //! This example shows writing the dac and eeprom and then using the read method to read back the
-//! written values. 
+//! written values.
 //! It calls read right after the set_dac_and_eeprom command to show that the eeprom_write_status is
 //! still false when writing. After the eeprom has been written the status turns to true.
 
@@ -52,16 +52,16 @@ fn main() -> ! {
     // Configure the MCP4725 DAC
     let mut dac = MCP4725::new(i2c, 0b010);
 
-    hprintln!("old status {:x?}", dac.read().unwrap()).unwrap();
+    hprintln!("old status {:x?}", dac.read().unwrap()).ok();
 
     // Set the output
-    dac.set_dac_and_eeprom(PowerDown::Resistor100kOhm, 0x0112).unwrap();
+    dac.set_dac_and_eeprom(PowerDown::Resistor100kOhm, 0x0112).ok();
 
     // This probably prints eeprom still writing
-    hprintln!("new status {:x?}", dac.read().unwrap()).unwrap();
+    hprintln!("new status {:x?}", dac.read().unwrap()).ok();
 
     // This prints eeprom done writing
-    hprintln!("new new status {:x?}", dac.read().unwrap()).unwrap();
+    hprintln!("new new status {:x?}", dac.read().unwrap()).ok();
 
     loop {}
 }
