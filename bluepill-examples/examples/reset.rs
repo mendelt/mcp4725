@@ -52,7 +52,7 @@ fn main() -> ! {
     dac.wake_up().unwrap();
 
     // Set the output high
-    dac.send_fast(&FastCommand::default().data(0x0fff)).unwrap();
+    dac.set_dac_fast(PowerDown::Normal, 0x0fff).unwrap();
 
     // Reset the chip to set the output low again
     dac.reset().unwrap();
