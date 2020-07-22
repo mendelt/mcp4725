@@ -81,19 +81,19 @@ where
         }
     }
 
-    /// Set the dac register
+    /// Set the dac output register and powerdown mode
     pub fn set_dac(&mut self, power: PowerDown, data: u16) -> Result<(), E> {
         let bytes = encode_command(CommandType::WriteDac, power, data);
         self.i2c.write(self.address, &bytes)
     }
 
-    /// Set the dac and eeprom registers
+    /// Set the dac and eeprom output registers and powerdown mode
     pub fn set_dac_and_eeprom(&mut self, power: PowerDown, data: u16) -> Result<(), E> {
         let bytes = encode_command(CommandType::WriteDacAndEEPROM, power, data);
         self.i2c.write(self.address, &bytes)
     }
 
-    /// Use the two byte fast command to set the dac register
+    /// Use the two byte fast command to set the dac register and powerdown mode
     pub fn set_dac_fast(&mut self, power: PowerDown, data: u16) -> Result<(), E> {
         let bytes = encode_fast_command(power, data);
         self.i2c.write(self.address, &bytes)
