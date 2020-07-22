@@ -51,6 +51,8 @@ mod status;
 use core::fmt::Debug;
 use embedded_hal::blocking::i2c::{Read, Write};
 use encode::{encode_address, encode_command, encode_fast_command};
+use embedded_hal::blocking::dac::DAC;
+
 pub use status::DacStatus;
 
 /// MCP4725 DAC driver. Wraps an I2C port to send commands to an MCP4725
@@ -124,6 +126,15 @@ where
     /// Destroy the MCP4725 driver, return the wrapped I2C
     pub fn destroy(self) -> I2C {
         self.i2c
+    }
+}
+
+impl<I2C, E> DAC<u16> for MCP4725<I2C> where I2C: Read<Error = E> + Write<Error = E>, {
+    type Error = E;
+
+    /// Set the DAC output register
+    fn try_set_output(&mut self, _: u16) -> Result<(), E> {
+        Ok(())
     }
 }
 
