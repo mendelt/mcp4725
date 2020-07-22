@@ -63,6 +63,9 @@ where
 {
     i2c: I2C,
     address: u8,
+
+    /// The default powerdown mode to use when setting the output using the DAC trait method
+    power_mode: PowerDown,
 }
 
 impl<I2C, E> MCP4725<I2C>
@@ -79,6 +82,7 @@ where
     pub fn new(i2c: I2C, user_address: u8) -> Self {
         MCP4725 {
             i2c,
+            power_mode: PowerDown::Normal,
             address: encode_address(user_address),
         }
     }
@@ -99,6 +103,11 @@ where
     pub fn set_dac_fast(&mut self, power: PowerDown, data: u16) -> Result<(), E> {
         let bytes = encode_fast_command(power, data);
         self.i2c.write(self.address, &bytes)
+    }
+
+    /// Set the default power down mode to use when setting the output using the DAC trait method
+    pub fn set_power_down_mode(&mut self, power: PowerDown) {
+        self.power_mode = power;
     }
 
     /// Send read command and return the dac status
@@ -133,8 +142,8 @@ impl<I2C, E> DAC<u16> for MCP4725<I2C> where I2C: Read<Error = E> + Write<Error 
     type Error = E;
 
     /// Set the DAC output register
-    fn try_set_output(&mut self, _: u16) -> Result<(), E> {
-        Ok(())
+    fn try_set_output(&mut self, value: u16) -> Result<(), E> {
+        self.set_dac_fast(self.power_mode, value)
     }
 }
 
