@@ -56,5 +56,7 @@ fn main() -> ! {
     // Reset the chip to set the output low again
     dac.reset().unwrap();
 
-    loop {}
+    loop {
+        continue;
+    }
 }

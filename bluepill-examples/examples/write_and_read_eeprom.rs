@@ -54,7 +54,8 @@ fn main() -> ! {
     hprintln!("old status {:x?}", dac.read().unwrap()).ok();
 
     // Set the output
-    dac.set_dac_and_eeprom(PowerDown::Resistor100kOhm, 0x0112).ok();
+    dac.set_dac_and_eeprom(PowerDown::Resistor100kOhm, 0x0112)
+        .ok();
 
     // This probably prints eeprom still writing
     hprintln!("new status {:x?}", dac.read().unwrap()).ok();
@@ -62,5 +63,7 @@ fn main() -> ! {
     // This prints eeprom done writing
     hprintln!("new new status {:x?}", dac.read().unwrap()).ok();
 
-    loop {}
+    loop {
+        continue;
+    }
 }
