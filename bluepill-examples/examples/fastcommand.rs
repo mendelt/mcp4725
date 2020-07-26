@@ -11,8 +11,7 @@ use hal::prelude::*;
 use hal::time::U32Ext;
 
 use mcp4725::*;
-#[allow(unused_imports)]
-use panic_semihosting;
+use panic_semihosting as _;
 
 #[entry]
 fn main() -> ! {
