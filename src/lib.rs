@@ -157,7 +157,9 @@ impl From<u8> for PowerDown {
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 #[repr(u8)]
 pub enum CommandType {
+    /// Write the dac register only
     WriteDac = 0x40,
+    /// Write the dac and eeprom register
     WriteDacAndEEPROM = 0x60,
 }
 
