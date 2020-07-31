@@ -43,6 +43,7 @@
 //! - [Crates.io](https://crates.io/crates/mcp4725)
 //!
 #![no_std]
+#![warn(missing_debug_implementations, missing_docs)]
 
 mod encode;
 mod status;
@@ -52,7 +53,6 @@ use embedded_hal::blocking::i2c::{Read, Write};
 use encode::{encode_address, encode_command, encode_fast_command};
 pub use status::DacStatus;
 
-#[warn(missing_debug_implementations, missing_docs)]
 
 /// MCP4725 DAC driver. Wraps an I2C port to send commands to an MCP4725
 #[derive(Debug)]
