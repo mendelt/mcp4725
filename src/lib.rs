@@ -49,9 +49,9 @@ mod encode;
 mod status;
 
 use core::fmt::Debug;
+use embedded_hal::blocking::dac::SingleChannelDac;
 use embedded_hal::blocking::i2c::{Read, Write};
 use encode::{encode_address, encode_command, encode_fast_command};
-use embedded_hal::blocking::dac::DAC;
 
 pub use status::DacStatus;
 
@@ -138,12 +138,14 @@ where
     }
 }
 
-impl<I2C, E> DAC for MCP4725<I2C> where I2C: Read<Error = E> + Write<Error = E>, {
+impl<I2C, E> SingleChannelDac for MCP4725<I2C>
+where
+    I2C: Read<Error = E> + Write<Error = E>,
+{
     type Error = E;
     type Word = u16;
 
-    /// Set the DAC output register
-    fn try_set_output(&mut self, value: u16) -> Result<(), E> {
+    fn try_set_value(&mut self, value: Self::Word) -> Result<(), Self::Error> {
         self.set_dac_fast(self.power_mode, value)
     }
 }

@@ -16,8 +16,7 @@ travis-ci = { repository = "mendelt/mcp4725" }
 
 [dependencies]
 # embedded-hal = "0.2.4"
-embedded-hal = { git = "https://github.com/mendelt/embedded-hal", branch = "dac" }
+embedded-hal = { git = "https://github.com/David-OConnor/embedded-hal.git", branch = "dac-trait" }
 
 [dev-dependencies]
-embedded-hal-mock = "0.7.2"
-
+# embedded-hal-mock = "0.7.2"
