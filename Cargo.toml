@@ -15,7 +15,7 @@ readme = "README.md"
 travis-ci = { repository = "mendelt/mcp4725" }
 
 [dependencies]
-embedded-hal = "0.2.4"
+embedded-hal = "0.2.5"
 
 [dev-dependencies]
 embedded-hal-mock = "0.7.2"
