@@ -137,7 +137,7 @@ pub enum PowerDown {
     Resistor1kOhm = 0b01,
     /// Power down mode, set outputs to 100k ohm to ground
     Resistor100kOhm = 0b10,
-    /// Power down mode, set outputs to 100k ohm to ground
+    /// Power down mode, set outputs to 500k ohm to ground
     Resistor500kOhm = 0b11,
 }
 
