@@ -15,7 +15,7 @@ pub fn encode_command(command: CommandType, power: PowerDown, data: u16) -> [u8;
     [
         command as u8 + ((power as u8) << 1),
         (data >> 4) as u8,
-        (data & 0x000f << 4) as u8,
+        ((data & 0x000f) << 4) as u8,
     ]
 }
 

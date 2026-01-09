@@ -48,7 +48,7 @@ impl DacStatus {
 
     /// Data currently stored in the DAC register
     pub fn data(&self) -> u16 {
-        ((self.bytes[1] as u16) << 4) + (self.bytes[2] as u16 >> 4)
+        ((self.bytes[1] as u16) << 4) | (self.bytes[2] as u16 >> 4)
     }
 
     /// Power mode stored in eeprom
@@ -61,6 +61,11 @@ impl DacStatus {
     /// Data stored in eeprom
     pub fn eeprom_data(&self) -> u16 {
         (self.bytes[3] & 0x0f) as u16 * 0x0100 + self.bytes[4] as u16
+    }
+
+    /// Raw bytes of the status message
+    pub fn as_bytes(&self) -> &[u8] {
+        &self.bytes
     }
 }
 
