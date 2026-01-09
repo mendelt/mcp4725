@@ -82,18 +82,27 @@ where
     }
 
     /// Set the dac register
+    ///
+    /// Data is the **12 bit** value to be outputed by the DAC.
+    /// The upper four bits are ignored.
     pub fn set_dac(&mut self, power: PowerDown, data: u16) -> Result<(), E> {
         let bytes = encode_command(CommandType::WriteDac, power, data);
         self.i2c.write(self.address, &bytes)
     }
 
     /// Set the dac and eeprom registers
+    ///
+    /// Data is the **12 bit** value to be outputed and stored by the DAC.
+    /// The upper four bits are ignored.
     pub fn set_dac_and_eeprom(&mut self, power: PowerDown, data: u16) -> Result<(), E> {
         let bytes = encode_command(CommandType::WriteDacAndEEPROM, power, data);
         self.i2c.write(self.address, &bytes)
     }
 
     /// Use the two byte fast command to set the dac register
+    ///
+    /// Data is the **12 bit** value to be outputed by the DAC.
+    /// The upper four bits are ignored.
     pub fn set_dac_fast(&mut self, power: PowerDown, data: u16) -> Result<(), E> {
         let bytes = encode_fast_command(power, data);
         self.i2c.write(self.address, &bytes)
