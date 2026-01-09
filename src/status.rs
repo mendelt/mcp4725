@@ -48,7 +48,7 @@ impl DacStatus {
 
     /// Data currently stored in the DAC register
     pub fn data(&self) -> u16 {
-        (self.bytes[1] as u16 * 0x0100 + self.bytes[2] as u16) >> 4
+        ((self.bytes[1] as u16) << 4) + (self.bytes[2] as u16 >> 4)
     }
 
     /// Power mode stored in eeprom
@@ -91,8 +91,8 @@ mod test_status {
         let status: DacStatus = [0u8, 0u8, 0u8, 0u8, 0u8].into();
         assert_eq!(status.data(), 0x0000);
 
-        let status: DacStatus = [0u8, 0xffu8, 0xffu8, 0x0f0u8, 0u8].into();
-        assert_eq!(status.data(), 0x0fff);
+        let status: DacStatus = [0_u8, 0xab, 0xcd, 0xf0, 0].into();
+        assert_eq!(status.data(), 0xabc);
     }
 
     #[test]
