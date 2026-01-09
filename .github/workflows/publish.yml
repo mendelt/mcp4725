@@ -10,18 +10,8 @@ jobs:
     name: Publish
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout source code
-        uses: actions/checkout@v2
-
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          profile: minimal
-          toolchain: nightly
-          override: true
-
-      - name: Publish
-        uses: actions-rs/cargo@v1
-        with:
-          command: publish
-          args: --verbose --all-features --token ${{ secrets.CRATES_IO_TOKEN }}
+          toolchain: stable
+      - run: cargo publish --verbose --all-features --token ${{ secrets.CRATES_IO_TOKEN }}

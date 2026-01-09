@@ -2,7 +2,7 @@
 name = "mcp4725"
 version = "0.4.2"
 edition = "2018"
-rust-version = "1.38"
+rust-version = "1.63.0"
 
 authors = ["Mendelt Siebenga <msiebenga@gmail.com>"]
 license = "MIT/Apache-2.0"
