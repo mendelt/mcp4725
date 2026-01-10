@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.4.3] - 2026-01-10
 
 ### Changed
 - Use any embedded hal v0.2
@@ -87,7 +87,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Send basic command to set output and power down mode
 - Example for sending basic commands
 
-[unreleased]: https://github.com/mendelt/mcp4725/compare/0.4.2...HEAD
+[unreleased]: https://github.com/mendelt/mcp4725/compare/0.4.3...HEAD
+[0.4.3]: https://github.com/mendelt/mcp4725/releases/tag/0.4.3
 [0.4.2]: https://github.com/mendelt/mcp4725/releases/tag/0.4.2
 [0.4.1]: https://github.com/mendelt/mcp4725/releases/tag/0.4.1
 [0.4.0]: https://github.com/mendelt/mcp4725/releases/tag/0.4.0
