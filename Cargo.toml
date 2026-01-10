@@ -13,7 +13,7 @@ keywords = ["dac", "i2c"]
 readme = "README.md"
 
 [dependencies]
-embedded-hal = "0.2.6"
+embedded-hal = "0.2"
 
 [dev-dependencies]
-embedded-hal-mock = "0.8.0"
+embedded-hal-mock = "0.8"
